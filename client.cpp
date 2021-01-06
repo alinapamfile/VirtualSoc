@@ -66,6 +66,7 @@ int main(int argc, char *argv[]) {
         }
 
         cout << response << endl;
+        fflush(stdout);
 
         if (strcmp(input, "log out") == 0 || strcmp(input, "delete account") == 0)
             exit(0);

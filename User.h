@@ -1,16 +1,20 @@
+#include <iostream>
+
+using namespace std;
+
+#define SIZE 2024
+
 class User {
 public:
-    string username;
-    string password;
-    string firstname, lastname;
-    string country, city;
-    string occupation;
-    string profileVisibility;
-    string isAdmin;
+    char* username = new char[SIZE];
+    char* password = new char[SIZE];
+    char* firstname = new char[SIZE];
+    char* lastname = new char[SIZE];
+    char* country = new char[SIZE];
+    char* city = new char[SIZE];
+    char* occupation = new char[SIZE];
+    char* profileVisibility = new char[SIZE];
+    int isAdmin;
 
-    User(const string &username, const string &password, const string &firstname, const string &lastname,
-         const string &country, const string &city, const string &occupation, const string &profileVisibility,
-         const string &isAdmin) : username(username), password(password), firstname(firstname), lastname(lastname),
-                                  country(country), city(city), occupation(occupation),
-                                  profileVisibility(profileVisibility), isAdmin(isAdmin) {}
+    User() {}
 };

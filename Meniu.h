@@ -1,0 +1,65 @@
+#include <iostream>
+
+using namespace std;
+
+class Meniu {
+public:
+    static constexpr const char* meniu_auth = "Enter one of the commands below:\n"
+                              "1. sign_up <username> <password> <firstname> <lastname> <profile visibility(public/private)>\n"
+                              "2. log_in <username> <password>\n"
+                              "3. continue\n";
+    static constexpr const char* meniu_unauth = "Because you are not authenticated, "
+                                                      "you can only access a few of the app's functionalities.\n"
+                                "Enter one of the commands below:\n"
+                                "1. search_user\n"
+                                "2. back\n";
+    static constexpr const char* meniu_user = "Enter one of the commands below:\n"
+                              "1. search_user\n"
+                              "2. share_post\n"
+                              "3. delete_post\n"
+                              "4. send_message\n"
+                              "5. unread_messages\n"
+                              "6. edit_profile\n"
+                              "7. delete_account\n"
+                              "8. log_out";
+    static constexpr const char* meniu_not_a_friend = "Enter one of the commands below:\n"
+                                    "1. user_details\n"
+                                    "2. user_posts\n"
+                                    "3. add_friend\n"
+                                    "4. add_close_friend\n"
+                                    "5. send_message\n"
+                                    "6. back\n";
+    static constexpr const char* meniu_friend = "Enter one of the commands below:\n"
+                              "1. user_details\n"
+                              "2. user_posts\n"
+                              "3. remove_friend\n"
+                              "4. send_message\n"
+                              "5. back\n";
+    static constexpr const char* meniu_unauth_user = "Because you are not authenticated, "
+                                                     "you can only access a few of the app's functionalities.\n"
+                                   "Enter one of the commands below:\n"
+                                   "1. user_details\n"
+                                   "2. user_posts\n"
+                                   "3. back";
+    static constexpr const char* meniu_admin_not_a_friend = "Enter one of the commands below:\n"
+                                          "1. user_details\n"
+                                          "2. user_posts\n"
+                                          "3. add_friend\n"
+                                          "4. add_close_friend\n"
+                                          "5. send_message\n"
+                                          "6. make_admin\n"
+                                          "7. delete_post\n"
+                                          "8. delete_user\n"
+                                          "9. back\n";
+    static constexpr const char* meniu_admin_friend = "Enter one of the commands below:\n"
+                                    "1. user_details\n"
+                                    "2. user_posts\n"
+                                    "3. remove_friend\n"
+                                    "4. send_message\n"
+                                    "5. make_admin\n"
+                                    "6. delete_post\n"
+                                    "7. delete_user\n"
+                                    "8. back\n";
+private:
+    Meniu() {}
+};
