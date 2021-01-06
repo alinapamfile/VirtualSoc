@@ -1,0 +1,6 @@
+client
+CMakeLists.txt
+server
+sqlite3.o
+virtualsoc.db
+cmake-build-debug
