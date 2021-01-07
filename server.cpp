@@ -9,8 +9,9 @@
 #include <sqlite3.h>
 
 #include "Meniu.h"
-#include "User.h"
 #include "Post.h"
+#include "Command.h"
+#include "Database.h"
 
 #define SIZE 2024
 #define PORT 1024
@@ -21,8 +22,6 @@ using namespace std;
 pthread_t tid[CLIENTS_MAX_NR];
 int counter = 0, clients[50];
 char* logged_users[50];
-pthread_mutex_t mutex;
-sqlite3* db;
 
 //User* currentUser = new User("alinapamfile", "ubh21kfg4", "Alina", "Pamfile", "Romania",
 //                             "Iasi", "student", "public", "yes");
@@ -76,151 +75,6 @@ sqlite3* db;
 //int addUser(string info[8]) { return 1; }
 //int addPost(string content, string visibility) { return 1; }
 
-
- void signUp(const int index, char* argv[], int argn, char* response) {
-     if (argn != 6) {
-         strcpy(response, "\nYou didn't enter enough parameters.\n\n");
-     } else {
-         char* stmt = new char[SIZE], param;
-         sqlite3_stmt *result;
-         int step;
-
-         //verificam daca exista deja un user cu acelasi username
-         strcpy(stmt, "SELECT * FROM users WHERE username=?;");
-
-         if (sqlite3_prepare_v2(db, stmt, -1, &result, NULL) != SQLITE_OK) {
-             cout << "[server] Error at sqlite3_prepare_v2().\n";
-             fflush(stdout);
-             strcpy(response, "\nCommand couldn't been executed.\n\n");
-             return;
-         }
-
-         if (sqlite3_bind_text(result, 1, argv[1], -1, NULL) != SQLITE_OK) {
-             cout << "[server] Error at sqlite3_bind_text()\n";
-             fflush(stdout);
-             strcpy(response, "\nCommand couldn't been executed.\n\n");
-             return;
-         }
-         step = sqlite3_step(result);
-
-         //exista un user cu acest username
-         if (step == SQLITE_ROW) {
-             strcpy(response, "\nUsername already exists.\n\n");
-             return;
-         }
-
-         sqlite3_finalize(result);
-
-         //criptam parola
-
-         //adaugam user-ul in baza de date
-         strcpy(stmt, "INSERT INTO users (username, password, firstname, lastname, profileVisibility, isAdmin) VALUES (?, ?, ?, ?, ?, 0);");
-
-         if (sqlite3_prepare_v2(db, stmt, -1, &result, NULL) != SQLITE_OK) {
-             cout << "[server] Error at sqlite3_prepare_v2().\n";
-             fflush(stdout);
-             strcpy(response, "\nCommand couldn't been executed.\n\n");
-             return;
-         }
-
-         if (sqlite3_bind_text(result, 1, argv[1], -1, NULL) != SQLITE_OK) {
-             cout << "[server] Error at sqlite3_bind_text()\n";
-             fflush(stdout);
-             strcpy(response, "\nCommand couldn't been executed.\n\n");
-             return;
-         }
-
-         if (sqlite3_bind_text(result, 2, argv[2], -1, NULL) != SQLITE_OK) {
-             cout << "[server] Error at sqlite3_bind_text()\n";
-             fflush(stdout);
-             strcpy(response, "\nCommand couldn't been executed.\n\n");
-             return;
-         }
-
-         if (sqlite3_bind_text(result, 3, argv[3], -1, NULL) != SQLITE_OK) {
-             cout << "[server] Error at sqlite3_bind_text()\n";
-             fflush(stdout);
-             strcpy(response, "\nCommand couldn't been executed.\n\n");
-             return;
-         }
-
-         if (sqlite3_bind_text(result, 4, argv[4], -1, NULL) != SQLITE_OK) {
-             cout << "[server] Error at sqlite3_bind_text()\n";
-             fflush(stdout);
-             strcpy(response, "\nCommand couldn't been executed.\n\n");
-             return;
-         }
-
-         if (sqlite3_bind_text(result, 5, argv[5], -1, NULL) != SQLITE_OK) {
-             cout << "[server] Error at sqlite3_bind_text()\n";
-             fflush(stdout);
-             strcpy(response, "\nCommand couldn't been executed.\n\n");
-             return;
-         }
-
-         step = sqlite3_step(result);
-         if (step != SQLITE_DONE) {
-             strcpy(response, "\nCommand couldn't been executed.\n\n");
-             return;
-         }
-         sqlite3_finalize(result);
-
-         strcpy(response, "\nSuccessfully signed up!\n\n");
-     }
-}
-
- void logIn(const int index, char* argv[], int argn, char* response) {
-     if (argn != 3) {
-         strcpy(response, "\nYou didn't enter enough parameters.\n\n");
-     } else {
-         char *stmt = new char[SIZE], param;
-         sqlite3_stmt *result;
-         int step;
-
-         //verificam daca exista deja un user cu acelasi username
-         strcpy(stmt, "SELECT * FROM users WHERE username=?;");
-
-         if (sqlite3_prepare_v2(db, stmt, -1, &result, NULL) != SQLITE_OK) {
-             cout << "[server] Error at sqlite3_prepare_v2().\n";
-             fflush(stdout);
-             strcpy(response, "\nCommand couldn't been executed.\n\n");
-             return;
-         }
-
-         if (sqlite3_bind_text(result, 1, argv[1], -1, NULL) != SQLITE_OK) {
-             cout << "[server] Error at sqlite3_bind_text()\n";
-             fflush(stdout);
-             strcpy(response, "\nCommand couldn't been executed.\n\n");
-             return;
-         }
-         step = sqlite3_step(result);
-
-         User user;
-         if (step == SQLITE_ROW) {
-             strcpy(user.username, static_cast<char const *> (sqlite3_column_text16(result, 0)));
-             strcpy(user.password, static_cast<char const *> (sqlite3_column_text16(result, 1)));
-             strcpy(user.firstname, static_cast<char const *> (sqlite3_column_text16(result, 2)));
-             strcpy(user.lastname, static_cast<char const *> (sqlite3_column_text16(result, 3)));
-             strcpy(user.country, static_cast<char const *> (sqlite3_column_text16(result, 4)));
-             strcpy(user.city, static_cast<char const *> (sqlite3_column_text16(result, 5)));
-             strcpy(user.occupation, static_cast<char const *> (sqlite3_column_text16(result, 6)));
-             strcpy(user.profileVisibility, static_cast<char const *> (sqlite3_column_text16(result, 7)));
-             user.isAdmin = sqlite3_column_int(result, 8);
-         } else {
-             strcpy(response, "\nUser doesn't exist.\n\n");
-             return;
-         }
-         sqlite3_finalize(result);
-cout << user.password << endl << argv[2] << endl;
-
-         if (strcmp(user.password, argv[2]) != 0) {
-             strcpy(response, "\nIncorrect password.\n\n");
-             return;
-         }
-
-         logged_users[index] = argv[1];
-         strcpy(response, "\nSuccessfully logged in!\n\n");
-     }
 //     //verifica daca user-ul exista
 //     if (userExists(username)) {
 //         cout << "[server] Username doesn't exist.\n";
@@ -239,7 +93,7 @@ cout << user.password << endl << argv[2] << endl;
 //     }
 //
 //     currentUser = user;
- }
+
 //
 // void editProfile(const string& field, string newValue) {
 //     //verifica daca field-ul este valid (daca exista in baza de date)
@@ -527,9 +381,9 @@ cout << user.password << endl << argv[2] << endl;
          }
 
          if (strcmp(argv[0], "sign_up") == 0) {
-             signUp(index, argv, argn, result);
+             Command::signUp(argv, argn, result);
          } else if (strcmp(argv[0], "log_in") == 0) {
-             logIn(index, argv, argn, result);
+             Command::logIn(argv, argn, result);
          } else if (strcmp(argv[0], "continue") == 0) {
              cout << "You are using the app without being authenticated.\n";
              fflush(stdout);
@@ -579,13 +433,14 @@ int main() {
     struct sockaddr_in client{};
     int sd, child, option = 1, clientd;
 
-    if (pthread_mutex_init(&mutex, NULL) != 0) {
+    if (pthread_mutex_init(&Command::mutex, NULL) != 0) {
         cout << "[server] Error at pthread_mutex_init().\n";
         fflush(stdout);
         exit(1);
     }
 
-    if (sqlite3_open("db", &db) != SQLITE_OK) {
+    //deschidem baza de date
+    if (sqlite3_open("db", &Database::db) != SQLITE_OK) {
         cout << "[server] Error at sqlite3_open().\n";
         fflush(stdout);
         exit(1);
