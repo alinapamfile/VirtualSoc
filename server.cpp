@@ -12,6 +12,7 @@
 #include "Post.h"
 #include "Command.h"
 #include "Database.h"
+#include "Utils.h"
 
 #define SIZE 2024
 #define PORT 1024
@@ -20,8 +21,8 @@
 using namespace std;
 
 pthread_t tid[CLIENTS_MAX_NR];
-int counter = 0, clients[50];
-char* logged_users[50];
+int counter = 0, connectedClients = 0, clients[50];
+char* logged_users[50] = {new char[50]}, *searched_users[50] = {new char[50]};
 
 //User* currentUser = new User("alinapamfile", "ubh21kfg4", "Alina", "Pamfile", "Romania",
 //                             "Iasi", "student", "public", "yes");
@@ -353,10 +354,78 @@ char* logged_users[50];
 //     }
 // }
 
- void* handle_client(void* arg) {
+void handleUnauthUser(int index) {
+
+}
+
+void handleLoggedUser(int index) {
+    char response[SIZE];
+    int argn;
+    char* argv[10], *result = new char[SIZE];
+
+    while (true) {
+        if (send(clients[index], Meniu::meniu_user, SIZE, 0) == -1) {
+            cout << "[server] Error at send().\n";
+            fflush(stdout);
+            continue;
+        }
+
+        if (recv(clients[index], &response, SIZE, 0) == -1) {
+            cout << "[server] Error at recv().\n";
+            fflush(stdout);
+            continue;
+        }
+
+        Utils::inputParse(response, argv, argn);
+
+        if (strcmp(argv[0], "search_user") == 0) {
+            if (Command::searchUser(argv, argn, result)) {
+                ///TODO: go to the next meniu
+                cout << "ok";
+                fflush(stdout);
+            }
+        } else if (strcmp(argv[0], "share_post") == 0) {
+            cout << "b";
+            fflush(stdout);
+        } else if (strcmp(argv[0], "delete_post") == 0) {
+            cout << "c";
+            fflush(stdout);
+        } else if (strcmp(argv[0], "send_message") == 0) {
+            cout << "d";
+            fflush(stdout);
+        } else if (strcmp(argv[0], "see_unread_messages") == 0) {
+            cout << "e";
+            fflush(stdout);
+        } else if (strcmp(argv[0], "edit_profile") == 0) {
+            Command::editProfile(logged_users[index], argv, argn, result);
+        } else if (strcmp(argv[0], "delete_account") == 0) {
+            cout << "g";
+            fflush(stdout);
+        } else if (strcmp(argv[0], "log_out") == 0) {
+            cout << "h";
+            fflush(stdout);
+        } else {
+            cout << "Unknown command";
+            fflush(stdout);
+        }
+
+        if (send(clients[index], result, SIZE, 0) == -1) {
+            cout << "[server] Error at send().\n";
+            fflush(stdout);
+            continue;
+        }
+
+        //incheie comunicarea
+        if (strcmp(argv[0], "log_out") == 0) {
+            pthread_exit(0);
+        }
+    }
+}
+
+void* authentication(void* arg) {
      char response[SIZE];
-     int index = *((int *)arg), argn = 0, code;
-     char* argv[10], *word, *result = new char[SIZE];
+     int index = *((int *)arg), argn, code;
+     char* argv[10], *result = new char[SIZE];
 
      //comunica cu clientul pana cand acesta se deconecteaza sau isi sterge contul
      while (true) {
@@ -374,44 +443,45 @@ char* logged_users[50];
              continue;
          }
 
-         word = strtok(response, " ");
-         while(word != NULL) {
-             argv[argn++] = word;
-             word = strtok(NULL, " ");
-         }
+         Utils::inputParse(response, argv, argn);
 
          if (strcmp(argv[0], "sign_up") == 0) {
-             Command::signUp(argv, argn, result);
+             if (Command::signUp(argv, argn, result)) {
+                 logged_users[index] = new char[50];
+                 strcpy(logged_users[index], argv[1]);
+
+                 if (send(clients[index], result, SIZE, 0) == -1) {
+                     cout << "[server] Error at send().\n";
+                     fflush(stdout);
+                     continue;
+                 }
+
+                 handleLoggedUser(index);
+             }
          } else if (strcmp(argv[0], "log_in") == 0) {
-             Command::logIn(argv, argn, result);
+             if (Command::logIn(argv, argn, result)) {
+                 logged_users[index] = new char[50];
+                 strcpy(logged_users[index], argv[1]);
+
+                 if (send(clients[index], result, SIZE, 0) == -1) {
+                     cout << "[server] Error at send().\n";
+                     fflush(stdout);
+                     continue;
+                 }
+
+                 handleLoggedUser(index);
+             }
          } else if (strcmp(argv[0], "continue") == 0) {
              cout << "You are using the app without being authenticated.\n";
              fflush(stdout);
+             strcpy(logged_users[index], "");
+             handleUnauthUser(index);
+         } else if (strcmp(argv[0], "quit") == 0) {
+             pthread_exit(0);
          } else {
              cout << "Unknown command";
              fflush(stdout);
          }
-
-         //exemple de apelari ale functiilor ce realizeaza comenzile:
-
-//                 edit_profile("city", "Tecuci");
-//                 search_user("mariapopa");
-//                 user_details("alinapamfile");
-//                 user_posts("alinapamfile");
-//                 share_post("Continutul postarii.", "public");
-//                 add_friend("mariapopa", "close friend");
-//                 remove_friend("mariapopa");
-//
-//                 string users[] = { "mariapopa" };
-//                 int nr = 1;
-//                 send_message("Un mesaj important.", users, nr);
-//
-//                 make_admin();
-//                 delete_user();
-//                 delete_user_post(1);
-//                 delete_post(1);
-//                 print_unread_messages();
-//                 delete_account();
 
          if (send(clients[index], result, SIZE, 0) == -1) {
              cout << "[server] Error at send().\n";
@@ -419,14 +489,12 @@ char* logged_users[50];
              continue;
          }
 
-         argn = 0;
-
          //incheie comunicarea
-         if (strcmp(response, "log out") == 0 || strcmp(response, "delete account") == 0){
-             pthread_join(tid[index], NULL);
+         if (strcmp(argv[0], "quit") == 0 || strcmp(argv[0], "log out") == 0 || strcmp(argv[0], "delete account") == 0) {
+             pthread_exit(0);
          }
      }
- }
+}
 
 int main() {
     struct sockaddr_in server{};
@@ -494,10 +562,16 @@ int main() {
             continue;
         }
 
-        counter++;
+        if (counter == CLIENTS_MAX_NR) {
+            counter = 1;
+        } else {
+            counter++;
+        }
+        ///TODO: decrementeaza cand se deconecteaza un client
+        connectedClients++;
         clients[counter] = clientd;
         //cream un nou thread
-        if (pthread_create(&(tid[counter]), NULL, handle_client, &counter) != 0) {
+        if (pthread_create(&(tid[counter]), NULL, authentication, &counter) != 0) {
             cout << "[server] Error at pthread_create().\n";
             fflush(stdout);
             continue;

@@ -7,9 +7,11 @@ using namespace std;
 class Database {
 public:
     static sqlite3* db;
-    static bool userExists(char *username, char *response);
-    static void addUser(char *argv[], int argn, char *response);
-    static User* getUser(char *username, char *response);
+    static int userExists(char *username, char *errMessage);
+    static bool addUser(char *argv[], int argn, char *errMessage);
+    static User* getUser(char *username, char *errMessage);
+    static bool getMatchingUsers(char *pattern, char *users[], int &count, char *errMessage);
+    static bool updateUser(char *username, char *field, char *value, char *errMessage);
 private:
     Database();
 };

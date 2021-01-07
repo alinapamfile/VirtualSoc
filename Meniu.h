@@ -7,19 +7,21 @@ public:
     static constexpr const char* meniu_auth = "Enter one of the commands below:\n"
                               "1. sign_up <username> <password> <firstname> <lastname> <profile visibility(public/private)>\n"
                               "2. log_in <username> <password>\n"
-                              "3. continue\n";
+                              "3. continue\n"
+                              "4. quit\n";
     static constexpr const char* meniu_unauth = "Because you are not authenticated, "
                                                       "you can only access a few of the app's functionalities.\n"
                                 "Enter one of the commands below:\n"
                                 "1. search_user\n"
-                                "2. back\n";
+                                "2. back\n"
+                                "3. quit";
     static constexpr const char* meniu_user = "Enter one of the commands below:\n"
-                              "1. search_user\n"
+                              "1. search_user <pattern>\n"
                               "2. share_post\n"
                               "3. delete_post\n"
                               "4. send_message\n"
                               "5. unread_messages\n"
-                              "6. edit_profile\n"
+                              "6. edit_profile <field> <new_value>\n"
                               "7. delete_account\n"
                               "8. log_out";
     static constexpr const char* meniu_not_a_friend = "Enter one of the commands below:\n"

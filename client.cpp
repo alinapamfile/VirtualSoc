@@ -59,6 +59,9 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
 
+        if (strcmp(input, "quit") == 0 || strcmp(input, "log_out") == 0 || strcmp(input, "delete_account") == 0)
+            exit(0);
+
         //primeste raspunsul din partea serverului
         if (recv(sd, response, SIZE, 0) == -1) {
             perror("[client] Error at recv().\n");
@@ -67,8 +70,5 @@ int main(int argc, char *argv[]) {
 
         cout << response << endl;
         fflush(stdout);
-
-        if (strcmp(input, "log out") == 0 || strcmp(input, "delete account") == 0)
-            exit(0);
     }
 }
