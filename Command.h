@@ -10,6 +10,8 @@ public:
     static bool logIn(char* argv[], int argn, char* response);
     static void editProfile(char *username, char* argv[], int argn, char* response);
     static bool searchUser(char *argv[], int argn, char *response);
+    static void sharePost(char *username, char *argv[], int argn, char *response);
+    static void deletePost(char *username, char *argv[], int argn, char *response);
 private:
     Command() {}
 };

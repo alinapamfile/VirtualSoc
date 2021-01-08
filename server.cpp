@@ -9,7 +9,6 @@
 #include <sqlite3.h>
 
 #include "Meniu.h"
-#include "Post.h"
 #include "Command.h"
 #include "Database.h"
 #include "Utils.h"
@@ -361,7 +360,7 @@ void handleUnauthUser(int index) {
 void handleLoggedUser(int index) {
     char response[SIZE];
     int argn;
-    char* argv[10], *result = new char[SIZE];
+    char* argv[10] = {new char[10]}, *result = new char[SIZE], *copy = new char[SIZE];
 
     while (true) {
         if (send(clients[index], Meniu::meniu_user, SIZE, 0) == -1) {
@@ -375,6 +374,7 @@ void handleLoggedUser(int index) {
             fflush(stdout);
             continue;
         }
+        strcpy(copy, response);
 
         Utils::inputParse(response, argv, argn);
 
@@ -385,11 +385,13 @@ void handleLoggedUser(int index) {
                 fflush(stdout);
             }
         } else if (strcmp(argv[0], "share_post") == 0) {
-            cout << "b";
-            fflush(stdout);
+            argn = 0;
+            argv[argn++] = strtok(copy, " ");
+            argv[argn++] = strtok(NULL, " ");
+            argv[argn++] = strtok(NULL, "\"");
+            Command::sharePost(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "delete_post") == 0) {
-            cout << "c";
-            fflush(stdout);
+            Command::deletePost(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "send_message") == 0) {
             cout << "d";
             fflush(stdout);

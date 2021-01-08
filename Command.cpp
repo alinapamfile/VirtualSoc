@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctime>
 
 using namespace std;
 
@@ -102,6 +103,54 @@ bool Command::searchUser(char *argv[], int argn, char *response) {
             } else {
                 strcat(response, "\n");
                 return false;
+            }
+        }
+    }
+}
+
+void Command::sharePost(char *username, char *argv[], int argn, char *response) {
+    if (argn != 3) {
+        strcpy(response, "\nYou didn't enter the parameters needed.\n\n");
+    } else {
+        time_t rawtime;
+        struct tm * timeinfo;
+
+        time (&rawtime);
+        timeinfo = localtime(&rawtime);
+
+        argv[argn] = new char[50];
+        argv[argn + 1] = new char[50];
+
+        strftime(argv[argn++],50,"%d-%m-%Y",timeinfo);
+        strftime(argv[argn++],50,"%H:%M",timeinfo);
+
+        if (Database::addPost(username, argv, argn, response)) {
+            strcpy(response, "\nPost shared successfully!\n\n");
+        }
+    }
+}
+
+void Command::deletePost(char *username, char *argv[], int argn, char *response) {
+    if (argn != 2) {
+        strcpy(response, "\nYou didn't enter the parameters needed.\n\n");
+    } else {
+        User *user = Database::getUser(username, response);
+        Post *post = Database::getPost(argv[1], response);
+
+        if (user->isAdmin) {
+            if (post) {
+                if (Database::deletePost(username, argv[1], response))
+                    strcpy(response, "\nPost deleted successfully!\n\n");
+            }
+        } else {
+            if (post) {
+                if (strcmp(post->username, username) == 0) {
+                    if (Database::deletePost(username, argv[1], response)) {
+                        strcpy(response, "\nPost deleted successfully!\n\n");
+                    }
+                } else {
+                    strcpy(response, "\nYou don't have a post with this id.\n\n");
+                }
             }
         }
     }

@@ -17,8 +17,8 @@ public:
                                 "3. quit";
     static constexpr const char* meniu_user = "Enter one of the commands below:\n"
                               "1. search_user <pattern>\n"
-                              "2. share_post\n"
-                              "3. delete_post\n"
+                              "2. share_post <post visibility(public/friends/close_friends)> \"<content>\"\n"
+                              "3. delete_post <postId>\n"
                               "4. send_message\n"
                               "5. unread_messages\n"
                               "6. edit_profile <field> <new_value>\n"
