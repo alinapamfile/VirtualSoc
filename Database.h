@@ -2,6 +2,7 @@
 #include <sqlite3.h>
 #include "User.h"
 #include "Post.h"
+#include "Message.h"
 
 using namespace std;
 
@@ -15,7 +16,8 @@ public:
     static bool updateUser(char *username, char *field, char *value, char *errMessage);
     static bool addPost(char *username, char *argv[], int argn, char *errMessage);
     static Post* getPost(char *id, char *errMessage);
-    static bool deletePost(char *username, char *id, char *errMessage);
+    static bool deletePost(char *id, char *errMessage);
+    static bool addMessage(char *argv[], int argn, char *errMessage);
 private:
     Database();
 };

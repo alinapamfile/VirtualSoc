@@ -21,7 +21,7 @@ using namespace std;
 
 pthread_t tid[CLIENTS_MAX_NR];
 int counter = 0, connectedClients = 0, clients[50];
-char* logged_users[50] = {new char[50]}, *searched_users[50] = {new char[50]};
+char* logged_users[50], *searched_users[50];
 
 //User* currentUser = new User("alinapamfile", "ubh21kfg4", "Alina", "Pamfile", "Romania",
 //                             "Iasi", "student", "public", "yes");
@@ -360,7 +360,7 @@ void handleUnauthUser(int index) {
 void handleLoggedUser(int index) {
     char response[SIZE];
     int argn;
-    char* argv[10] = {new char[10]}, *result = new char[SIZE], *copy = new char[SIZE];
+    char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
 
     while (true) {
         if (send(clients[index], Meniu::meniu_user, SIZE, 0) == -1) {
@@ -393,8 +393,14 @@ void handleLoggedUser(int index) {
         } else if (strcmp(argv[0], "delete_post") == 0) {
             Command::deletePost(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "send_message") == 0) {
-            cout << "d";
-            fflush(stdout);
+            char *word;
+            argn = 0;
+            argv[argn++] = strtok(copy, " ");
+            argv[argn++] = strtok(NULL, "\"");
+            while((word = strtok(NULL, " ")) != NULL) {
+                argv[argn++] = word;
+            }
+            Command::sendMessage(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "see_unread_messages") == 0) {
             cout << "e";
             fflush(stdout);

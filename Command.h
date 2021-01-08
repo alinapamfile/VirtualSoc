@@ -12,6 +12,7 @@ public:
     static bool searchUser(char *argv[], int argn, char *response);
     static void sharePost(char *username, char *argv[], int argn, char *response);
     static void deletePost(char *username, char *argv[], int argn, char *response);
+    static void sendMessage(char *username, char *argv[], int argn, char *response);
 private:
     Command() {}
 };

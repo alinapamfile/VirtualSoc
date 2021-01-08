@@ -149,13 +149,8 @@ bool Database::getMatchingUsers(char *pattern, char *users[], int &count, char *
 }
 
 bool Database::updateUser(char *username, char *field, char *value, char *errMessage) {
-    string stmt;
-    sqlite3_stmt *result;
-    int step;
-
-    //pregatim comanda sql
-    stmt = (string)"UPDATE users SET " + (string)field + (string)"='" + (string)value + (string)"' WHERE username='"
-            + (string)username + (string)"';";
+    string stmt  = (string)"UPDATE users SET " + (string)field + (string)"='" + (string)value
+                    + (string)"' WHERE username='" + (string)username + (string)"';";
 
     if (sqlite3_exec(db, stmt.c_str(), NULL, NULL, NULL) != SQLITE_OK) {
         strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
@@ -166,12 +161,8 @@ bool Database::updateUser(char *username, char *field, char *value, char *errMes
 }
 
 bool Database::addPost(char *username, char *argv[], int argn, char *errMessage) {
-    string stmt;
-    sqlite3_stmt *result;
-    int step;
+    string stmt = (string)"INSERT INTO posts VALUES (null, '" + (string)username + "'";
 
-    //pregatim comanda sql
-    stmt = (string)"INSERT INTO posts VALUES (null, '" + (string)username + "'";
     for (int i = 1; i < argn; i++) {
         stmt += (string)", '" + (string)argv[i] + "'";
     }
@@ -225,14 +216,29 @@ Post* Database::getPost(char *id, char *errMessage) {
     }
 }
 
-bool Database::deletePost(char *username, char *id, char *errMessage) {
-    string stmt;
-    sqlite3_stmt *result;
-    int step;
-
-    stmt = (string)"DELETE FROM posts WHERE id=" + (string)id + ";";
+bool Database::deletePost(char *id, char *errMessage) {
+    string stmt = (string)"DELETE FROM posts WHERE id=" + (string)id + ";";
 
     if (sqlite3_exec(db, stmt.c_str(), NULL, NULL, NULL) != SQLITE_OK) {
+        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool Database::addMessage(char *argv[], int argn, char *errMessage) {
+    string stmt = (string)"INSERT INTO messages VALUES (";
+    for (int i = 0; i < argn; i++) {
+        if (i != 0)
+            stmt += (string)", ";
+        stmt += (string)"'" + (string)argv[i] + (string)"'";
+    }
+
+    stmt += (string)");";
+
+    if (sqlite3_exec(db, stmt.c_str(), NULL, NULL, NULL) != SQLITE_OK) {
+        cout << stmt << endl;
         strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
         return false;
     } else {

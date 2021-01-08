@@ -4,9 +4,12 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctime>
+
+#include "Utils.h"
 
 using namespace std;
+
+#define SIZE 2024
 
 pthread_mutex_t Command::mutex;
 
@@ -112,17 +115,8 @@ void Command::sharePost(char *username, char *argv[], int argn, char *response) 
     if (argn != 3) {
         strcpy(response, "\nYou didn't enter the parameters needed.\n\n");
     } else {
-        time_t rawtime;
-        struct tm * timeinfo;
-
-        time (&rawtime);
-        timeinfo = localtime(&rawtime);
-
-        argv[argn] = new char[50];
-        argv[argn + 1] = new char[50];
-
-        strftime(argv[argn++],50,"%d-%m-%Y",timeinfo);
-        strftime(argv[argn++],50,"%H:%M",timeinfo);
+        argv[argn++] = Utils::getCurrentDate();
+        argv[argn++] = Utils::getCurrentTime();
 
         if (Database::addPost(username, argv, argn, response)) {
             strcpy(response, "\nPost shared successfully!\n\n");
@@ -139,18 +133,46 @@ void Command::deletePost(char *username, char *argv[], int argn, char *response)
 
         if (user->isAdmin) {
             if (post) {
-                if (Database::deletePost(username, argv[1], response))
+                if (Database::deletePost(argv[1], response))
                     strcpy(response, "\nPost deleted successfully!\n\n");
             }
         } else {
             if (post) {
                 if (strcmp(post->username, username) == 0) {
-                    if (Database::deletePost(username, argv[1], response)) {
+                    if (Database::deletePost(argv[1], response)) {
                         strcpy(response, "\nPost deleted successfully!\n\n");
                     }
                 } else {
                     strcpy(response, "\nYou don't have a post with this id.\n\n");
                 }
+            }
+        }
+    }
+}
+
+void Command::sendMessage(char *username, char *argv[], int argn, char *response) {
+    if (argn < 3) {
+        strcpy(response, "\nYou didn't enter the parameters needed.\n\n");
+    } else {
+        User *user;
+        char *args[5], *res = new char[SIZE];
+        for (int i = 0; i < 5; i++)
+            args[i] = new char[SIZE];
+
+        for (int i = 2; i < argn; i++) {
+            user = Database::getUser(argv[i], res);
+            if (user) {
+                strcpy(args[0], username);
+                strcpy(args[1], argv[i]);
+                strcpy(args[2], argv[1]);
+                strcpy(args[3], Utils::getCurrentDate());
+                strcpy(args[4], Utils::getCurrentTime());
+                if (Database::addMessage(args, 5, res))
+                    strcat(response, "\nMessage sent.\n\n");
+                else
+                    strcat(response, res);
+            } else {
+                strcat(response, res);
             }
         }
     }
