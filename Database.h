@@ -18,6 +18,8 @@ public:
     static Post* getPost(char *id, char *errMessage);
     static bool deletePost(char *id, char *errMessage);
     static bool addMessage(char *argv[], int argn, char *errMessage);
+    static bool getMessages(char *receiver, Message *messages[], int &count, char *errMessage);
+    static void deleteUnreadMessages(char *receiver);
 private:
     Database();
 };

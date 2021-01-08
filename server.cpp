@@ -402,8 +402,7 @@ void handleLoggedUser(int index) {
             }
             Command::sendMessage(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "see_unread_messages") == 0) {
-            cout << "e";
-            fflush(stdout);
+            Command::seeUnreadMessages(logged_users[index], argn, result);
         } else if (strcmp(argv[0], "edit_profile") == 0) {
             Command::editProfile(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "delete_account") == 0) {

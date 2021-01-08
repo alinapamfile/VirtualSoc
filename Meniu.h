@@ -20,7 +20,7 @@ public:
                               "2. share_post <post visibility(public/friends/close_friends)> \"<content>\"\n"
                               "3. delete_post <postId>\n"
                               "4. send_message \"<message>\" <receiver username> [<receiver username> ... ]\n"
-                              "5. unread_messages\n"
+                              "5. see_unread_messages\n"
                               "6. edit_profile <field> <new_value>\n"
                               "7. delete_account\n"
                               "8. log_out";

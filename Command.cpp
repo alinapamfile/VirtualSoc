@@ -177,3 +177,26 @@ void Command::sendMessage(char *username, char *argv[], int argn, char *response
         }
     }
 }
+
+void Command::seeUnreadMessages(char *username, int argn, char *response) {
+    if (argn != 1) {
+        strcpy(response, "\nYou entered too many parameters.\n\n");
+    } else {
+        Message *messages[50];
+        int count;
+        if (Database::getMessages(username, messages, count, response)) {
+            if (count != 0) {
+                strcpy(response, "\nYour messages:\n\n");
+                for (int i = 0; i < count; i++) {
+                    strcat(response, "Date: "); strcat(response, messages[i]->date);
+                    strcat(response, "\nTime: "); strcat(response, messages[i]->time);
+                    strcat(response, "\nFrom: "); strcat(response, messages[i]->sender);
+                    strcat(response, "\nMessage: "); strcat(response, messages[i]->content);
+                    strcat(response, "\n\n");
+                }
+            } else {
+                strcpy(response, "\nYou don't have any new messages.\n\n");
+            }
+        }
+    }
+}

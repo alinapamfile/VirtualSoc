@@ -245,3 +245,47 @@ bool Database::addMessage(char *argv[], int argn, char *errMessage) {
         return true;
     }
 }
+
+bool Database::getMessages(char *receiver, Message *messages[], int &count, char *errMessage) {
+    char *stmt = new char[SIZE];
+    sqlite3_stmt *result;
+    count = 0;
+
+    strcpy(stmt, "SELECT * FROM messages WHERE receiver=?;");
+
+    if (sqlite3_prepare_v2(db, stmt, -1, &result, NULL) != SQLITE_OK) {
+        cout << "[server] Error at sqlite3_prepare_v2().\n";
+        fflush(stdout);
+        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+        return false;
+    }
+
+    if (sqlite3_bind_text(result, 1, receiver, -1, NULL) != SQLITE_OK) {
+        cout << "[server] Error at sqlite3_bind_text()\n";
+        fflush(stdout);
+        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+        return false;
+    }
+
+    while (sqlite3_step(result) != SQLITE_DONE) {
+        messages[count] = new Message();
+        strcpy(messages[count]->sender, reinterpret_cast<char*>(const_cast<unsigned char*>(sqlite3_column_text(result, 0))));
+        strcpy(messages[count]->receiver, reinterpret_cast<char*>(const_cast<unsigned char*>(sqlite3_column_text(result, 1))));
+        strcpy(messages[count]->content, reinterpret_cast<char*>(const_cast<unsigned char*>(sqlite3_column_text(result, 2))));
+        strcpy(messages[count]->date, reinterpret_cast<char*>(const_cast<unsigned char*>(sqlite3_column_text(result, 3))));
+        strcpy(messages[count]->time, reinterpret_cast<char*>(const_cast<unsigned char*>(sqlite3_column_text(result, 4))));
+        count++;
+    }
+
+    sqlite3_finalize(result);
+
+    if (count != 0)
+        deleteUnreadMessages(receiver);
+    return true;
+}
+
+void Database::deleteUnreadMessages(char *receiver) {
+    string stmt = (string)"DELETE FROM messages WHERE receiver='" + (string)receiver + (string)"';";
+
+    sqlite3_exec(db, stmt.c_str(), NULL, NULL, NULL);
+}
