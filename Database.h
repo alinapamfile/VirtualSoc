@@ -22,6 +22,7 @@ public:
     static void deleteUnreadMessages(char *receiver);
     static bool getUserPosts(char *user, char *visibility, Post *posts[], int &count, char *errMessage);
     static bool addFriend(char *argv[], int argn, char *errMessage);
+    static bool deleteFriend(char *user, char *friend_username, char *errMessage);
 private:
     Database();
 };

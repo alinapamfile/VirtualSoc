@@ -348,3 +348,15 @@ bool Database::addFriend(char *argv[], int argn, char *errMessage) {
         return true;
     }
 }
+
+bool Database::deleteFriend(char *user, char *friend_username, char *errMessage) {
+    string stmt = (string)"DELETE FROM friends WHERE user='" + (string)user + (string)"' AND friend='"
+                    + (string)friend_username + (string)"';";
+
+    if (sqlite3_exec(db, stmt.c_str(), NULL, NULL, NULL) != SQLITE_OK) {
+        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+        return false;
+    } else {
+        return true;
+    }
+}

@@ -267,9 +267,10 @@ void Command::seeUserPosts(char *username, char *searchedUser, int argn, char *r
     }
 }
 
-void Command::addFriend(char *username, char *friend_username, const char *type, int argn, char *response) {
+bool Command::addFriend(char *username, char *friend_username, const char *type, int argn, char *response) {
     if (argn != 1) {
         strcpy(response, "\nYou entered too many parameters.\n\n");
+        return false;
     } else {
         char *args[3];
         for (int i = 0; i < 3; i++)
@@ -279,7 +280,27 @@ void Command::addFriend(char *username, char *friend_username, const char *type,
         strcpy(args[1], friend_username);
         strcpy(args[2], type);
 
-        if (Database::addFriend(args, 3, response))
+        if (Database::addFriend(args, 3, response)) {
             strcpy(response, "\nFriend added successfully!\n\n");
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+bool Command::removeFriend(char *username, char *friend_username, int argn, char *response) {
+    if (argn != 1) {
+        strcpy(response, "\nYou entered too many parameters.\n\n");
+        return false;
+    } else {
+        if (Database::deleteFriend(username, friend_username, response)) {
+            strcpy(response, "\nUser ");
+            strcat(response, friend_username);
+            strcat(response, " has been removed from your friends list!\n\n");
+            return true;
+        } else {
+            return false;
+        }
     }
 }

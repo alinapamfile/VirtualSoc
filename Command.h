@@ -16,7 +16,8 @@ public:
     static void seeUnreadMessages(char *username, int argn, char *response);
     static void seeUserDetails(char *username, char *searchedUser, int argn, char *response);
     static void seeUserPosts(char *username, char *searchedUser, int argn, char *response);
-    static void addFriend(char *username, char *friend_username, const char *type, int argn, char *response);
+    static bool addFriend(char *username, char *friend_username, const char *type, int argn, char *response);
+    static bool removeFriend(char *username, char *friend_username, int argn, char *response);
 private:
     Command() {}
 };

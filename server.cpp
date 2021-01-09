@@ -23,6 +23,11 @@ pthread_t tid[CLIENTS_MAX_NR];
 int counter = 0, connectedClients = 0, clients[50];
 char* logged_users[50], *searched_users[50];
 
+void handleFriendUser(int index);
+void handleNotFriendUser(int index);
+void handleFriendAdmin(int index);
+void handleNotFriendAdmin(int index);
+
 void handleFriendUser(int index) {
     char response[SIZE];
     int argn;
@@ -48,6 +53,16 @@ void handleFriendUser(int index) {
             Command::seeUserDetails(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "see_user_posts") == 0) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
+        } else if (strcmp(argv[0], "remove_friend") == 0) {
+            if (Command::removeFriend(logged_users[index], searched_users[index], argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                handleNotFriendUser(index);
+            }
         } else {
             cout << "Unknown command";
             fflush(stdout);
@@ -93,9 +108,25 @@ void handleNotFriendUser(int index) {
         } else if (strcmp(argv[0], "see_user_posts") == 0) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "add_friend") == 0) {
-            Command::addFriend(logged_users[index], searched_users[index], "friend", argn, result);
+            if (Command::addFriend(logged_users[index], searched_users[index], "friend", argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                handleFriendUser(index);
+            }
         } else if (strcmp(argv[0], "add_close_friend") == 0) {
-            Command::addFriend(logged_users[index], searched_users[index], "close_friend", argn, result);
+            if (Command::addFriend(logged_users[index], searched_users[index], "close_friend", argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                handleFriendUser(index);
+            }
         } else {
             cout << "Unknown command";
             fflush(stdout);
@@ -138,6 +169,16 @@ void handleFriendAdmin(int index) {
             Command::seeUserDetails(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "see_user_posts") == 0) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
+        } else if (strcmp(argv[0], "remove_friend") == 0) {
+            if (Command::removeFriend(logged_users[index], searched_users[index], argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                handleNotFriendAdmin(index);
+            }
         } else {
             cout << "Unknown command";
             fflush(stdout);
@@ -181,9 +222,25 @@ void handleNotFriendAdmin(int index) {
         } else if (strcmp(argv[0], "see_user_posts") == 0) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "add_friend") == 0) {
-            Command::addFriend(logged_users[index], searched_users[index], "friend", argn, result);
+            if (Command::addFriend(logged_users[index], searched_users[index], "friend", argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                handleFriendAdmin(index);
+            }
         } else if (strcmp(argv[0], "add_close_friend") == 0) {
-            Command::addFriend(logged_users[index], searched_users[index], "close_friend", argn, result);
+            if (Command::addFriend(logged_users[index], searched_users[index], "close_friend", argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                handleFriendAdmin(index);
+            }
         } else {
             cout << "Unknown command";
             fflush(stdout);
