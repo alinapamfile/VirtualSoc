@@ -14,6 +14,8 @@ public:
     static void deletePost(char *username, char *argv[], int argn, char *response);
     static void sendMessage(char *username, char *argv[], int argn, char *response);
     static void seeUnreadMessages(char *username, int argn, char *response);
+    static void seeUserDetails(char *username, char *searchedUser, int argn, char *response);
+    static void seeUserPosts(char *username, char *searchedUser, int argn, char *response);
 private:
     Command() {}
 };

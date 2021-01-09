@@ -1,5 +1,8 @@
 #include "Utils.h"
 #include <string.h>
+#include <iostream>
+
+#define SIZE 2024
 
 void Utils::inputParse(char response[], char* argv[], int &argn) {
     char *word;
@@ -33,4 +36,47 @@ char* Utils::getCurrentTime() {
 
     strftime(currenttime,50,"%H:%M",timeinfo);
     return currenttime;
+}
+
+int Utils::isFriend(sqlite3* db, char *username, char *friend_username, const char *type, char *errMessage) {
+    char *stmt = new char[SIZE];
+    sqlite3_stmt *result;
+    int step;
+
+    if (type)
+        strcpy(stmt, "SELECT * FROM friends WHERE user=? AND friend=? AND type=?;");
+    else
+        strcpy(stmt, "SELECT * FROM friends WHERE user=? AND friend=?;");
+
+    if (sqlite3_prepare_v2(db, stmt, -1, &result, NULL) != SQLITE_OK) {
+        cout << "[server] Error at sqlite3_prepare_v2().\n";
+        fflush(stdout);
+        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+        return -1;
+    }
+
+    if (sqlite3_bind_text(result, 1, username, -1, NULL) != SQLITE_OK) {
+        cout << "[server] Error at sqlite3_bind_text()\n";
+        fflush(stdout);
+        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+        return -1;
+    }
+
+    if (sqlite3_bind_text(result, 2, friend_username, -1, NULL) != SQLITE_OK) {
+        cout << "[server] Error at sqlite3_bind_text()\n";
+        fflush(stdout);
+        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+        return -1;
+    }
+
+    if (type)
+        if (sqlite3_bind_text(result, 3, type, -1, NULL) != SQLITE_OK) {
+            cout << "[server] Error at sqlite3_bind_text()\n";
+            fflush(stdout);
+            strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+            return -1;
+        }
+
+    step = sqlite3_step(result);
+    return step == SQLITE_ROW;
 }

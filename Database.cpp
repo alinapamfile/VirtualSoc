@@ -289,3 +289,45 @@ void Database::deleteUnreadMessages(char *receiver) {
 
     sqlite3_exec(db, stmt.c_str(), NULL, NULL, NULL);
 }
+
+bool Database::getUserPosts(char *user, char *visibility, Post *posts[], int &count, char *errMessage) {
+    char *stmt = new char[SIZE];
+    sqlite3_stmt *result;
+    count = 0;
+
+    if (visibility) {
+        strcpy(stmt, "SELECT * FROM posts WHERE username=? ");
+        strcat(stmt, visibility);
+        strcat(stmt, ";");
+    }
+    else
+        strcpy(stmt, "SELECT * FROM posts WHERE username=?;");
+
+    if (sqlite3_prepare_v2(db, stmt, -1, &result, NULL) != SQLITE_OK) {
+        cout << "[server] Error at sqlite3_prepare_v2().\n";
+        fflush(stdout);
+        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+        return false;
+    }
+
+    if (sqlite3_bind_text(result, 1, user, -1, NULL) != SQLITE_OK) {
+        cout << "[server] Error at sqlite3_bind_text()\n";
+        fflush(stdout);
+        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+        return false;
+    }
+
+    while (sqlite3_step(result) != SQLITE_DONE) {
+        posts[count] = new Post();
+        posts[count]->id = sqlite3_column_int(result, 0);
+        strcpy(posts[count]->username, reinterpret_cast<char*>(const_cast<unsigned char*>(sqlite3_column_text(result, 1))));
+        strcpy(posts[count]->postVisibility, reinterpret_cast<char*>(const_cast<unsigned char*>(sqlite3_column_text(result, 2))));
+        strcpy(posts[count]->content, reinterpret_cast<char*>(const_cast<unsigned char*>(sqlite3_column_text(result, 3))));
+        strcpy(posts[count]->date, reinterpret_cast<char*>(const_cast<unsigned char*>(sqlite3_column_text(result, 4))));
+        strcpy(posts[count]->time, reinterpret_cast<char*>(const_cast<unsigned char*>(sqlite3_column_text(result, 5))));
+        count++;
+    }
+
+    sqlite3_finalize(result);
+    return true;
+}

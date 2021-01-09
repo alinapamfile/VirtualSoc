@@ -1,11 +1,10 @@
 #include "Command.h"
 #include "Database.h"
+#include "Utils.h"
 
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "Utils.h"
 
 using namespace std;
 
@@ -196,6 +195,72 @@ void Command::seeUnreadMessages(char *username, int argn, char *response) {
                 }
             } else {
                 strcpy(response, "\nYou don't have any new messages.\n\n");
+            }
+        }
+    }
+}
+
+void Command::seeUserDetails(char *username, char *searchedUser, int argn, char *response) {
+    if (argn != 1) {
+        strcpy(response, "\nYou entered too many parameters.\n\n");
+    } else {
+        User *user1 = Database::getUser(username, response);
+        User *user2 = Database::getUser(searchedUser, response);
+        int is_friend = Utils::isFriend(Database::db, username, searchedUser, "friend", response);
+        int is_close_friend = Utils::isFriend(Database::db, username, searchedUser, "close_friend", response);
+
+        if (strcmp(user2->profileVisibility, "public") == 0 || (user1 != NULL && user1->isAdmin) || is_friend == 1 || is_close_friend == 1) {
+            strcpy(response, "Username: "); strcat(response, user2->username);
+            strcat(response, "\nFirstname: "); strcat(response, user2->firstname);
+            strcat(response, "\nLastname: "); strcat(response, user2->lastname);
+            strcat(response, "\nCountry: "); strcat(response, user2->country);
+            strcat(response, "\nCity: "); strcat(response, user2->city);
+            strcat(response, "\nOccupation: "); strcat(response, user2->occupation);
+            strcat(response, "\n\n");
+        } else {
+            strcpy(response, "Username: "); strcat(response, user2->username);
+            strcat(response, "\nFirstname: "); strcat(response, user2->firstname);
+            strcat(response, "\nLastname: "); strcat(response, user2->lastname);
+            strcat(response, "\n\n");
+        }
+    }
+}
+
+void Command::seeUserPosts(char *username, char *searchedUser, int argn, char *response) {
+    if (argn != 1) {
+        strcpy(response, "\nYou entered too many parameters.\n\n");
+    } else {
+        User *user1 = Database::getUser(username, response);
+        User *user2 = Database::getUser(searchedUser, response);
+        int is_friend = Utils::isFriend(Database::db, username, searchedUser, "friend", response);
+        int is_close_friend = Utils::isFriend(Database::db, username, searchedUser, "close_friend", response);
+
+        char *visibility = new char[SIZE];
+        if (user1 == NULL || (!is_friend && !is_close_friend && !user1->isAdmin)) {
+            strcpy(visibility, "AND postVisibility='public'");
+        } else if (user1->isAdmin || is_close_friend) {
+            visibility = NULL;
+        } else {
+            strcpy(visibility, "AND (postVisibility='public' OR postVisibility='friend')");
+        }
+
+        Post *posts[50];
+        int count;
+
+        if (Database::getUserPosts(searchedUser, visibility, posts, count, response)) {
+            if (count != 0) {
+                strcpy(response, "\n");
+                strcat(response, searchedUser);
+                strcat(response, "'s posts:\n\n");
+                for (int i = 0; i < count; i++) {
+                    strcat(response, "Id: "); strcat(response, to_string(posts[i]->id).c_str());
+                    strcat(response, "\nDate: "); strcat(response, posts[i]->date);
+                    strcat(response, "\nTime: "); strcat(response, posts[i]->time);
+                    strcat(response, "\nContent: "); strcat(response, posts[i]->content);
+                    strcat(response, "\n\n");
+                }
+            } else {
+                strcpy(response, "\nUser doesn't have any posts.\n\n");
             }
         }
     }
