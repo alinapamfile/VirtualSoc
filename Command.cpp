@@ -149,6 +149,7 @@ void Command::deletePost(char *username, char *argv[], int argn, char *response)
     }
 }
 
+///TODO: scapa de res??
 void Command::sendMessage(char *username, char *argv[], int argn, char *response) {
     if (argn < 3) {
         strcpy(response, "\nYou didn't enter the parameters needed.\n\n");
@@ -263,5 +264,22 @@ void Command::seeUserPosts(char *username, char *searchedUser, int argn, char *r
                 strcpy(response, "\nUser doesn't have any posts.\n\n");
             }
         }
+    }
+}
+
+void Command::addFriend(char *username, char *friend_username, const char *type, int argn, char *response) {
+    if (argn != 1) {
+        strcpy(response, "\nYou entered too many parameters.\n\n");
+    } else {
+        char *args[3];
+        for (int i = 0; i < 3; i++)
+            args[i] = new char[SIZE];
+
+        strcpy(args[0], username);
+        strcpy(args[1], friend_username);
+        strcpy(args[2], type);
+
+        if (Database::addFriend(args, 3, response))
+            strcpy(response, "\nFriend added successfully!\n\n");
     }
 }

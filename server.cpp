@@ -92,6 +92,10 @@ void handleNotFriendUser(int index) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "see_user_posts") == 0) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
+        } else if (strcmp(argv[0], "add_friend") == 0) {
+            Command::addFriend(logged_users[index], searched_users[index], "friend", argn, result);
+        } else if (strcmp(argv[0], "add_close_friend") == 0) {
+            Command::addFriend(logged_users[index], searched_users[index], "close_friend", argn, result);
         } else {
             cout << "Unknown command";
             fflush(stdout);
@@ -176,6 +180,10 @@ void handleNotFriendAdmin(int index) {
             Command::seeUserDetails(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "see_user_posts") == 0) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
+        } else if (strcmp(argv[0], "add_friend") == 0) {
+            Command::addFriend(logged_users[index], searched_users[index], "friend", argn, result);
+        } else if (strcmp(argv[0], "add_close_friend") == 0) {
+            Command::addFriend(logged_users[index], searched_users[index], "close_friend", argn, result);
         } else {
             cout << "Unknown command";
             fflush(stdout);

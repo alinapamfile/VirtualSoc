@@ -238,7 +238,6 @@ bool Database::addMessage(char *argv[], int argn, char *errMessage) {
     stmt += (string)");";
 
     if (sqlite3_exec(db, stmt.c_str(), NULL, NULL, NULL) != SQLITE_OK) {
-        cout << stmt << endl;
         strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
         return false;
     } else {
@@ -330,4 +329,22 @@ bool Database::getUserPosts(char *user, char *visibility, Post *posts[], int &co
 
     sqlite3_finalize(result);
     return true;
+}
+
+bool Database::addFriend(char *argv[], int argn, char *errMessage) {
+    string stmt = (string)"INSERT INTO friends VALUES (";
+
+    for (int i = 0; i < argn; i++) {
+        if (i != 0)
+            stmt += (string)", ";
+        stmt += (string)"'" + (string)argv[i] + (string)"'";
+    }
+    stmt += (string)");";
+
+    if (sqlite3_exec(db, stmt.c_str(), NULL, NULL, NULL) != SQLITE_OK) {
+        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+        return false;
+    } else {
+        return true;
+    }
 }
