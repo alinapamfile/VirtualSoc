@@ -304,3 +304,17 @@ bool Command::removeFriend(char *username, char *friend_username, int argn, char
         }
     }
 }
+
+bool Command::deleteAccount(char *username, int argn, char *response) {
+    if (argn != 1) {
+        strcpy(response, "\nYou entered too many parameters.\n\n");
+        return false;
+    } else {
+        if (Database::deleteUser(username, response)) {
+            strcpy(response, "\nAccount deleted successfully!\n\n");
+            return true;
+        } else {
+            return false;
+        }
+    }
+}

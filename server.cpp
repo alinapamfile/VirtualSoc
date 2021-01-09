@@ -384,8 +384,15 @@ void handleLoggedUser(int index) {
         } else if (strcmp(argv[0], "edit_profile") == 0) {
             Command::editProfile(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "delete_account") == 0) {
-            cout << "g";
-            fflush(stdout);
+            if (Command::deleteAccount(logged_users[index], argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                pthread_exit(0);
+            }
         } else if (strcmp(argv[0], "log_out") == 0) {
             cout << "h";
             fflush(stdout);

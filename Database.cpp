@@ -71,6 +71,17 @@ bool Database::addUser(char *argv[], int argn, char *errMessage) {
     }
 }
 
+bool Database::deleteUser(char *username, char *errMessage) {
+    string stmt = (string)"DELETE FROM users WHERE username='" + (string)username + (string)"';";
+
+    if (sqlite3_exec(db, stmt.c_str(), NULL, NULL, NULL) != SQLITE_OK) {
+        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+        return false;
+    } else {
+        return true;
+    }
+}
+
 User* Database::getUser(char *username, char *errMessage) {
     char *stmt = new char[SIZE];
     sqlite3_stmt *result;
