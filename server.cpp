@@ -171,6 +171,8 @@ void adminOnAdminUserProfile(int index) {
             Command::seeUserDetails(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "see_user_posts") == 0) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
+        } else if (strcmp(argv[0], "delete_post") == 0) {
+            Command::deletePost(logged_users[index], argv, argn, result);
         } else {
             cout << "Unknown command";
             fflush(stdout);
@@ -223,6 +225,8 @@ void adminOnAdminFriendProfile(int index) {
 
                 adminOnAdminUserProfile(index);
             }
+        } else if (strcmp(argv[0], "delete_post") == 0) {
+            Command::deletePost(logged_users[index], argv, argn, result);
         } else {
             cout << "Unknown command";
             fflush(stdout);
@@ -285,6 +289,8 @@ void adminOnFriendProfile(int index) {
 
                 adminOnAdminFriendProfile(index);
             }
+        } else if (strcmp(argv[0], "delete_post") == 0) {
+            Command::deletePost(logged_users[index], argv, argn, result);
         } else {
             cout << "Unknown command";
             fflush(stdout);
@@ -357,6 +363,8 @@ void adminOnUserProfile(int index) {
 
                 adminOnAdminUserProfile(index);
             }
+        } else if (strcmp(argv[0], "delete_post") == 0) {
+            Command::deletePost(logged_users[index], argv, argn, result);
         } else {
             cout << "Unknown command";
             fflush(stdout);
