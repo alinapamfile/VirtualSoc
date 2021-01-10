@@ -13,8 +13,7 @@ public:
                                                       "you can only access a few of the app's functionalities.\n"
                                 "Enter one of the commands below:\n"
                                 "1. search_user\n"
-                                "2. back\n"
-                                "3. quit";
+                                "2. quit";
     static constexpr const char* meniu_auth_user = "Enter one of the commands below:\n"
                               "1. search_user <pattern>\n"
                               "2. share_post <post visibility(public/friends/close_friends)> \"<content>\"\n"

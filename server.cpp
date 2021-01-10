@@ -20,7 +20,7 @@
 using namespace std;
 
 pthread_t tid[CLIENTS_MAX_NR];
-int counter = 0, connectedClients = 0, clients[50];
+int counter = 0, clients[50];
 char* logged_users[50], *searched_users[50];
 
 void handleLoggedUser(int index);
@@ -75,6 +75,13 @@ void userOnFriendProfile(int index) {
             strcpy(argv[argn++], searched_users[index]);
             Command::sendMessage(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "back") == 0) {
+            strcpy(result, "\nGoing back on the main menu.\n\n");
+            if (send(clients[index], result, SIZE, 0) == -1) {
+                cout << "[server] Error at send().\n";
+                fflush(stdout);
+                continue;
+            }
+
             handleLoggedUser(index);
             continue;
         } else {
@@ -85,10 +92,6 @@ void userOnFriendProfile(int index) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
-        }
-
-        if (strcmp(argv[0], "log_out") == 0) {
-            pthread_exit(0);
         }
     }
 }
@@ -118,8 +121,6 @@ void userOnUserProfile(int index) {
             Command::seeUserDetails(logged_users[index], searched_users[index], argn, result);
         } else if(strcmp(argv[0], "see_user_posts") == 0) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
-        } else if (strcmp(argv[0], "see_user_posts") == 0) {
-            Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "add_friend") == 0) {
             if (Command::addFriend(logged_users[index], searched_users[index], "friend", argn, result)) {
                 if (send(clients[index], result, SIZE, 0) == -1) {
@@ -148,6 +149,13 @@ void userOnUserProfile(int index) {
             strcpy(argv[argn++], searched_users[index]);
             Command::sendMessage(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "back") == 0) {
+            strcpy(result, "\nGoing back on the main menu.\n\n");
+            if (send(clients[index], result, SIZE, 0) == -1) {
+                cout << "[server] Error at send().\n";
+                fflush(stdout);
+                continue;
+            }
+
             handleLoggedUser(index);
             continue;
         } else {
@@ -158,10 +166,6 @@ void userOnUserProfile(int index) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
-        }
-
-        if (strcmp(argv[0], "log_out") == 0) {
-            pthread_exit(0);
         }
     }
 }
@@ -191,6 +195,26 @@ void adminOnAdminUserProfile(int index) {
             Command::seeUserDetails(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "see_user_posts") == 0) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
+        } else if (strcmp(argv[0], "add_friend") == 0) {
+            if (Command::addFriend(logged_users[index], searched_users[index], "friend", argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                adminOnAdminFriendProfile(index);
+            }
+        } else if (strcmp(argv[0], "add_close_friend") == 0) {
+            if (Command::addFriend(logged_users[index], searched_users[index], "close_friend", argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                adminOnAdminFriendProfile(index);
+            }
         } else if (strcmp(argv[0], "send_message") == 0) {
             argn = 0;
             argv[argn++] = strtok(copy, " ");
@@ -211,6 +235,13 @@ void adminOnAdminUserProfile(int index) {
                 pthread_exit(0);
             }
         } else if (strcmp(argv[0], "back") == 0) {
+            strcpy(result, "\nGoing back on the main menu.\n\n");
+            if (send(clients[index], result, SIZE, 0) == -1) {
+                cout << "[server] Error at send().\n";
+                fflush(stdout);
+                continue;
+            }
+
             handleLoggedUser(index);
             continue;
         } else {
@@ -221,10 +252,6 @@ void adminOnAdminUserProfile(int index) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
-        }
-
-        if (strcmp(argv[0], "log_out") == 0) {
-            pthread_exit(0);
         }
     }
 }
@@ -284,6 +311,13 @@ void adminOnAdminFriendProfile(int index) {
                 pthread_exit(0);
             }
         } else if (strcmp(argv[0], "back") == 0) {
+            strcpy(result, "\nGoing back on the main menu.\n\n");
+            if (send(clients[index], result, SIZE, 0) == -1) {
+                cout << "[server] Error at send().\n";
+                fflush(stdout);
+                continue;
+            }
+
             handleLoggedUser(index);
             continue;
         } else {
@@ -294,10 +328,6 @@ void adminOnAdminFriendProfile(int index) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
-        }
-
-        if (strcmp(argv[0], "log_out") == 0) {
-            pthread_exit(0);
         }
     }
 }
@@ -367,6 +397,13 @@ void adminOnFriendProfile(int index) {
                 pthread_exit(0);
             }
         } else if (strcmp(argv[0], "back") == 0) {
+            strcpy(result, "\nGoing back on the main menu.\n\n");
+            if (send(clients[index], result, SIZE, 0) == -1) {
+                cout << "[server] Error at send().\n";
+                fflush(stdout);
+                continue;
+            }
+
             handleLoggedUser(index);
             continue;
         } else {
@@ -377,10 +414,6 @@ void adminOnFriendProfile(int index) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
-        }
-
-        if (strcmp(argv[0], "log_out") == 0) {
-            pthread_exit(0);
         }
     }
 }
@@ -460,6 +493,13 @@ void adminOnUserProfile(int index) {
                 pthread_exit(0);
             }
         } else if (strcmp(argv[0], "back") == 0) {
+            strcpy(result, "\nGoing back on the main menu.\n\n");
+            if (send(clients[index], result, SIZE, 0) == -1) {
+                cout << "[server] Error at send().\n";
+                fflush(stdout);
+                continue;
+            }
+
             handleLoggedUser(index);
             continue;
         } else {
@@ -470,10 +510,6 @@ void adminOnUserProfile(int index) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
-        }
-
-        if (strcmp(argv[0], "log_out") == 0) {
-            pthread_exit(0);
         }
     }
 }
@@ -503,6 +539,13 @@ void unauthUserOnUserProfile(int index) {
         } else if (strcmp(argv[0], "see_user_posts") == 0) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "back") == 0) {
+            strcpy(result, "\nGoing back on the main menu.\n\n");
+            if (send(clients[index], result, SIZE, 0) == -1) {
+                cout << "[server] Error at send().\n";
+                fflush(stdout);
+                continue;
+            }
+
             handleUnauthUser(index);
             continue;
         } else {
@@ -672,8 +715,7 @@ void handleLoggedUser(int index) {
                 pthread_exit(0);
             }
         } else if (strcmp(argv[0], "log_out") == 0) {
-            cout << "h";
-            fflush(stdout);
+
         } else {
             strcpy(result, "\nUnknown command\n\n");
         }
@@ -752,6 +794,7 @@ void* authentication(void* arg) {
 
              logged_users[index] = NULL;
              handleUnauthUser(index);
+             continue;
          } else if (strcmp(argv[0], "quit") == 0) {
              pthread_exit(0);
          } else {
@@ -775,6 +818,9 @@ int main() {
     struct sockaddr_in server{};
     struct sockaddr_in client{};
     int sd, child, option = 1, clientd;
+
+    for (int i = 0; i < CLIENTS_MAX_NR; i++)
+        clients[i] = -1;
 
     if (pthread_mutex_init(&Command::mutex, NULL) != 0) {
         cout << "[server] Error at pthread_mutex_init().\n";
@@ -837,15 +883,19 @@ int main() {
             continue;
         }
 
-        if (counter == CLIENTS_MAX_NR) {
-            counter = 0;
+        while(clients[counter] != -1) {
+            if (counter == CLIENTS_MAX_NR) {
+                counter = 0;
+            } else {
+                counter++;
+            }
         }
 
-        ///TODO: decrementeaza cand se deconecteaza un client
-        connectedClients++;
         clients[counter++] = clientd;
+
+        int index = counter - 1;
         //cream un nou thread
-        if (pthread_create(&(tid[counter - 1]), NULL, authentication, &counter - 1) != 0) {
+        if (pthread_create(&(tid[counter - 1]), NULL, authentication, &index) != 0) {
             cout << "[server] Error at pthread_create().\n";
             fflush(stdout);
             continue;
