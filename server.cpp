@@ -65,6 +65,13 @@ void userOnFriendProfile(int index) {
 
                 userOnUserProfile(index);
             }
+        } else if (strcmp(argv[0], "send_message") == 0) {
+            argn = 0;
+            argv[argn++] = strtok(copy, " ");
+            argv[argn++] = strtok(NULL, "\"");
+            argv[argn] = new char[SIZE];
+            strcpy(argv[argn++], searched_users[index]);
+            Command::sendMessage(logged_users[index], argv, argn, result);
         } else {
             cout << "Unknown command";
             fflush(stdout);
@@ -129,6 +136,13 @@ void userOnUserProfile(int index) {
 
                 userOnFriendProfile(index);
             }
+        } else if (strcmp(argv[0], "send_message") == 0) {
+            argn = 0;
+            argv[argn++] = strtok(copy, " ");
+            argv[argn++] = strtok(NULL, "\"");
+            argv[argn] = new char[SIZE];
+            strcpy(argv[argn++], searched_users[index]);
+            Command::sendMessage(logged_users[index], argv, argn, result);
         } else {
             cout << "Unknown command";
             fflush(stdout);
@@ -171,6 +185,13 @@ void adminOnAdminUserProfile(int index) {
             Command::seeUserDetails(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "see_user_posts") == 0) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
+        } else if (strcmp(argv[0], "send_message") == 0) {
+            argn = 0;
+            argv[argn++] = strtok(copy, " ");
+            argv[argn++] = strtok(NULL, "\"");
+            argv[argn] = new char[SIZE];
+            strcpy(argv[argn++], searched_users[index]);
+            Command::sendMessage(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "delete_post") == 0) {
             Command::deletePost(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "delete_user") == 0) {
@@ -235,6 +256,13 @@ void adminOnAdminFriendProfile(int index) {
 
                 adminOnAdminUserProfile(index);
             }
+        } else if (strcmp(argv[0], "send_message") == 0) {
+            argn = 0;
+            argv[argn++] = strtok(copy, " ");
+            argv[argn++] = strtok(NULL, "\"");
+            argv[argn] = new char[SIZE];
+            strcpy(argv[argn++], searched_users[index]);
+            Command::sendMessage(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "delete_post") == 0) {
             Command::deletePost(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "delete_user") == 0) {
@@ -299,6 +327,13 @@ void adminOnFriendProfile(int index) {
 
                 adminOnUserProfile(index);
             }
+        } else if (strcmp(argv[0], "send_message") == 0) {
+            argn = 0;
+            argv[argn++] = strtok(copy, " ");
+            argv[argn++] = strtok(NULL, "\"");
+            argv[argn] = new char[SIZE];
+            strcpy(argv[argn++], searched_users[index]);
+            Command::sendMessage(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "make_admin") == 0) {
             if (Command::makeAdmin(searched_users[index], argn, result)) {
                 if (send(clients[index], result, SIZE, 0) == -1) {
@@ -383,6 +418,13 @@ void adminOnUserProfile(int index) {
 
                 adminOnFriendProfile(index);
             }
+        } else if (strcmp(argv[0], "send_message") == 0) {
+            argn = 0;
+            argv[argn++] = strtok(copy, " ");
+            argv[argn++] = strtok(NULL, "\"");
+            argv[argn] = new char[SIZE];
+            strcpy(argv[argn++], searched_users[index]);
+            Command::sendMessage(logged_users[index], argv, argn, result);
         } else if (strcmp(argv[0], "make_admin") == 0) {
             if (Command::makeAdmin(searched_users[index], argn, result)) {
                 if (send(clients[index], result, SIZE, 0) == -1) {
