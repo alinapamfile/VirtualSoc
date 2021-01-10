@@ -36,7 +36,7 @@ void userOnFriendProfile(int index) {
     char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
 
     while (true) {
-        if (send(clients[index], Meniu::meniu_friend, SIZE, 0) == -1) {
+        if (send(clients[index], Meniu::meniu_user_on_friend_profile, SIZE, 0) == -1) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
@@ -88,7 +88,7 @@ void userOnUserProfile(int index) {
     char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
 
     while (true) {
-        if (send(clients[index], Meniu::meniu_not_a_friend, SIZE, 0) == -1) {
+        if (send(clients[index], Meniu::meniu_user_on_user, SIZE, 0) == -1) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
@@ -152,7 +152,7 @@ void adminOnAdminUserProfile(int index) {
     char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
 
     while (true) {
-        if (send(clients[index], Meniu::meniu_admin_adminuser, SIZE, 0) == -1) {
+        if (send(clients[index], Meniu::meniu_admin_on_admin_user_profile, SIZE, 0) == -1) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
@@ -194,7 +194,7 @@ void adminOnAdminFriendProfile(int index) {
     char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
 
     while (true) {
-        if (send(clients[index], Meniu::meniu_admin_adminfriend, SIZE, 0) == -1) {
+        if (send(clients[index], Meniu::meniu_admin_on_admin_friend_profile, SIZE, 0) == -1) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
@@ -246,7 +246,7 @@ void adminOnFriendProfile(int index) {
     char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
 
     while (true) {
-        if (send(clients[index], Meniu::meniu_admin_friend, SIZE, 0) == -1) {
+        if (send(clients[index], Meniu::meniu_admin_on_friend_profile, SIZE, 0) == -1) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
@@ -308,7 +308,7 @@ void adminOnUserProfile(int index) {
     char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
 
     while (true) {
-        if (send(clients[index], Meniu::meniu_admin_not_a_friend, SIZE, 0) == -1) {
+        if (send(clients[index], Meniu::meniu_admin_on_user_profile, SIZE, 0) == -1) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
@@ -355,7 +355,7 @@ void adminOnUserProfile(int index) {
                     continue;
                 }
 
-                adminOnAdminFriendProfile(index);
+                adminOnAdminUserProfile(index);
             }
         } else {
             cout << "Unknown command";
@@ -374,14 +374,13 @@ void adminOnUserProfile(int index) {
     }
 }
 
-//functionalitatile din meniul principal al utilizatorului nelogat
-void handleUnauthUser(int index) {
+void unauthUserOnUserProfile(int index) {
     char response[SIZE];
     int argn;
     char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
 
     while (true) {
-        if (send(clients[index], Meniu::meniu_unauth, SIZE, 0) == -1) {
+        if (send(clients[index], Meniu::meniu_unauth_user_on_profile, SIZE, 0) == -1) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
@@ -409,8 +408,59 @@ void handleUnauthUser(int index) {
             fflush(stdout);
             continue;
         }
+    }
+}
 
-        if (strcmp(argv[0], "log_out") == 0) {
+//functionalitatile din meniul principal al utilizatorului nelogat
+void handleUnauthUser(int index) {
+    char response[SIZE];
+    int argn;
+    char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
+
+    while (true) {
+        if (send(clients[index], Meniu::meniu_unauth_user, SIZE, 0) == -1) {
+            cout << "[server] Error at send().\n";
+            fflush(stdout);
+            continue;
+        }
+
+        if (recv(clients[index], &response, SIZE, 0) == -1) {
+            cout << "[server] Error at recv().\n";
+            fflush(stdout);
+            continue;
+        }
+
+        Utils::inputParse(response, argv, argn);
+
+        if (strcmp(argv[0], "search_user") == 0) {
+            if (Command::searchUser(argv, argn, result)) {
+                searched_users[index] = new char[50];
+                strcpy(searched_users[index], argv[1]);
+
+                strcpy(result, "\nYou are now on ");
+                strcat(result, searched_users[index]);
+                strcat(result, "'s profile.\n\n");
+
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                unauthUserOnUserProfile(index);
+            }
+        } else {
+            cout << "Unknown command";
+            fflush(stdout);
+        }
+
+        if (send(clients[index], result, SIZE, 0) == -1) {
+            cout << "[server] Error at send().\n";
+            fflush(stdout);
+            continue;
+        }
+
+        if (strcmp(argv[0], "quit") == 0) {
             pthread_exit(0);
         }
     }
@@ -423,7 +473,7 @@ void handleLoggedUser(int index) {
     char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
 
     while (true) {
-        if (send(clients[index], Meniu::meniu_user, SIZE, 0) == -1) {
+        if (send(clients[index], Meniu::meniu_auth_user, SIZE, 0) == -1) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
@@ -455,37 +505,33 @@ void handleLoggedUser(int index) {
 
                 User *user1 = Database::getUser(logged_users[index], result);
                 User *user2 = Database::getUser(searched_users[index], result);
+                int code = Utils::isFriend(Database::db, logged_users[index], searched_users[index], NULL, result);
 
-                if (user1) {
-                    int code = Utils::isFriend(Database::db, logged_users[index], searched_users[index], NULL, result);
-                    if (code == 1) {
-                        if (user1->isAdmin) {
-                            if (user2->isAdmin) {
-                                adminOnAdminFriendProfile(index);
-                                continue;
-                            } else {
-                                adminOnFriendProfile(index);
-                                continue;
-                            }
-                        }
-                        else {
-                            userOnFriendProfile(index);
+                if (code == 1) {
+                    if (user1->isAdmin) {
+                        if (user2->isAdmin) {
+                            adminOnAdminFriendProfile(index);
+                            continue;
+                        } else {
+                            adminOnFriendProfile(index);
                             continue;
                         }
-                    } else if (code == 0) {
-                        if (user1->isAdmin) {
-                            if (user2->isAdmin) {
-                                adminOnAdminUserProfile(index);
-                                continue;
-                            } else {
-                                adminOnUserProfile(index);
-                                continue;
-                            }
-                        }
-                        else {
-                            userOnUserProfile(index);
+                    } else {
+                        userOnFriendProfile(index);
+                        continue;
+                    }
+                } else if (code == 0) {
+                    if (user1->isAdmin) {
+                        if (user2->isAdmin) {
+                            adminOnAdminUserProfile(index);
+                            continue;
+                        } else {
+                            adminOnUserProfile(index);
                             continue;
                         }
+                    } else {
+                        userOnUserProfile(index);
+                        continue;
                     }
                 }
             }
@@ -592,8 +638,14 @@ void* authentication(void* arg) {
                  handleLoggedUser(index);
              }
          } else if (strcmp(argv[0], "continue") == 0) {
-             cout << "You are using the app without being authenticated.\n";
-             fflush(stdout);
+             strcpy(result, "You are using the app without being authenticated.\n");
+
+             if (send(clients[index], result, SIZE, 0) == -1) {
+                 cout << "[server] Error at send().\n";
+                 fflush(stdout);
+                 continue;
+             }
+
              logged_users[index] = NULL;
              handleUnauthUser(index);
          } else if (strcmp(argv[0], "quit") == 0) {
