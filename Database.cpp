@@ -72,14 +72,27 @@ bool Database::addUser(char *argv[], int argn, char *errMessage) {
 }
 
 bool Database::deleteUser(char *username, char *errMessage) {
-    string stmt = (string)"DELETE FROM users WHERE username='" + (string)username + (string)"';";
+    string stmts[4];
 
-    if (sqlite3_exec(db, stmt.c_str(), NULL, NULL, NULL) != SQLITE_OK) {
-        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
-        return false;
-    } else {
-        return true;
+    stmts[0] = (string)"DELETE FROM users WHERE username='" + (string)username + (string)"';";
+    stmts[1] = (string)"DELETE FROM posts WHERE username='" + (string)username + (string)"';";
+    stmts[2] = (string)"DELETE FROM friends WHERE user='" + (string)username + (string)"' OR friend='"
+                    + (string)username + (string)"';";
+    stmts[3] = (string)"DELETE FROM messages WHERE sender='" + (string)username + (string)"' OR receiver='"
+                   + (string)username + (string)"';";
+
+    sqlite3_exec(db, "BEGIN TRANSACTION;", NULL, NULL, NULL);
+
+    for (int i = 0; i < 4; i++) {
+        if (sqlite3_exec(db, stmts[i].c_str(), NULL, NULL, NULL) != SQLITE_OK) {
+            strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+            return false;
+        }
     }
+
+    sqlite3_exec(db, "END TRANSACTION;", NULL, NULL, NULL);
+
+    return true;
 }
 
 User* Database::getUser(char *username, char *errMessage) {
