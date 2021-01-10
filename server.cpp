@@ -23,6 +23,8 @@ pthread_t tid[CLIENTS_MAX_NR];
 int counter = 0, connectedClients = 0, clients[50];
 char* logged_users[50], *searched_users[50];
 
+void handleLoggedUser(int index);
+void handleUnauthUser(int index);
 void userOnFriendProfile(int index);
 void userOnUserProfile(int index);
 void adminOnAdminUserProfile(int index);
@@ -72,9 +74,11 @@ void userOnFriendProfile(int index) {
             argv[argn] = new char[SIZE];
             strcpy(argv[argn++], searched_users[index]);
             Command::sendMessage(logged_users[index], argv, argn, result);
+        } else if (strcmp(argv[0], "back") == 0) {
+            handleLoggedUser(index);
+            continue;
         } else {
-            cout << "Unknown command";
-            fflush(stdout);
+           strcpy(result, "\nUnknown command\n\n");
         }
 
         if (send(clients[index], result, SIZE, 0) == -1) {
@@ -143,9 +147,11 @@ void userOnUserProfile(int index) {
             argv[argn] = new char[SIZE];
             strcpy(argv[argn++], searched_users[index]);
             Command::sendMessage(logged_users[index], argv, argn, result);
+        } else if (strcmp(argv[0], "back") == 0) {
+            handleLoggedUser(index);
+            continue;
         } else {
-            cout << "Unknown command";
-            fflush(stdout);
+            strcpy(result, "\nUnknown command\n\n");
         }
 
         if (send(clients[index], result, SIZE, 0) == -1) {
@@ -204,9 +210,11 @@ void adminOnAdminUserProfile(int index) {
 
                 pthread_exit(0);
             }
+        } else if (strcmp(argv[0], "back") == 0) {
+            handleLoggedUser(index);
+            continue;
         } else {
-            cout << "Unknown command";
-            fflush(stdout);
+            strcpy(result, "\nUnknown command\n\n");
         }
 
         if (send(clients[index], result, SIZE, 0) == -1) {
@@ -275,9 +283,11 @@ void adminOnAdminFriendProfile(int index) {
 
                 pthread_exit(0);
             }
+        } else if (strcmp(argv[0], "back") == 0) {
+            handleLoggedUser(index);
+            continue;
         } else {
-            cout << "Unknown command";
-            fflush(stdout);
+            strcpy(result, "\nUnknown command\n\n");
         }
 
         if (send(clients[index], result, SIZE, 0) == -1) {
@@ -356,9 +366,11 @@ void adminOnFriendProfile(int index) {
 
                 pthread_exit(0);
             }
+        } else if (strcmp(argv[0], "back") == 0) {
+            handleLoggedUser(index);
+            continue;
         } else {
-            cout << "Unknown command";
-            fflush(stdout);
+            strcpy(result, "\nUnknown command\n\n");
         }
 
         if (send(clients[index], result, SIZE, 0) == -1) {
@@ -447,9 +459,11 @@ void adminOnUserProfile(int index) {
 
                 pthread_exit(0);
             }
+        } else if (strcmp(argv[0], "back") == 0) {
+            handleLoggedUser(index);
+            continue;
         } else {
-            cout << "Unknown command";
-            fflush(stdout);
+            strcpy(result, "\nUnknown command\n\n");
         }
 
         if (send(clients[index], result, SIZE, 0) == -1) {
@@ -488,9 +502,11 @@ void unauthUserOnUserProfile(int index) {
             Command::seeUserDetails(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "see_user_posts") == 0) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
+        } else if (strcmp(argv[0], "back") == 0) {
+            handleUnauthUser(index);
+            continue;
         } else {
-            cout << "Unknown command";
-            fflush(stdout);
+            strcpy(result, "\nUnknown command\n\n");
         }
 
         if (send(clients[index], result, SIZE, 0) == -1) {
@@ -540,8 +556,7 @@ void handleUnauthUser(int index) {
                 unauthUserOnUserProfile(index);
             }
         } else {
-            cout << "Unknown command";
-            fflush(stdout);
+            strcpy(result, "\nUnknown command\n\n");
         }
 
         if (send(clients[index], result, SIZE, 0) == -1) {
@@ -660,8 +675,7 @@ void handleLoggedUser(int index) {
             cout << "h";
             fflush(stdout);
         } else {
-            cout << "Unknown command";
-            fflush(stdout);
+            strcpy(result, "\nUnknown command\n\n");
         }
 
         if (send(clients[index], result, SIZE, 0) == -1) {
@@ -741,8 +755,7 @@ void* authentication(void* arg) {
          } else if (strcmp(argv[0], "quit") == 0) {
              pthread_exit(0);
          } else {
-             cout << "Unknown command";
-             fflush(stdout);
+             strcpy(result, "\nUnknown command\n\n");
          }
 
          if (send(clients[index], result, SIZE, 0) == -1) {
