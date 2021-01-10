@@ -83,7 +83,6 @@ void userOnFriendProfile(int index) {
             }
 
             handleLoggedUser(index);
-            continue;
         } else {
            strcpy(result, "\nUnknown command\n\n");
         }
@@ -157,7 +156,6 @@ void userOnUserProfile(int index) {
             }
 
             handleLoggedUser(index);
-            continue;
         } else {
             strcpy(result, "\nUnknown command\n\n");
         }
@@ -243,7 +241,6 @@ void adminOnAdminUserProfile(int index) {
             }
 
             handleLoggedUser(index);
-            continue;
         } else {
             strcpy(result, "\nUnknown command\n\n");
         }
@@ -319,7 +316,6 @@ void adminOnAdminFriendProfile(int index) {
             }
 
             handleLoggedUser(index);
-            continue;
         } else {
             strcpy(result, "\nUnknown command\n\n");
         }
@@ -405,7 +401,6 @@ void adminOnFriendProfile(int index) {
             }
 
             handleLoggedUser(index);
-            continue;
         } else {
             strcpy(result, "\nUnknown command\n\n");
         }
@@ -501,7 +496,6 @@ void adminOnUserProfile(int index) {
             }
 
             handleLoggedUser(index);
-            continue;
         } else {
             strcpy(result, "\nUnknown command\n\n");
         }
@@ -517,7 +511,7 @@ void adminOnUserProfile(int index) {
 void unauthUserOnUserProfile(int index) {
     char response[SIZE];
     int argn;
-    char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
+    char* argv[20], *result = new char[SIZE];
 
     while (true) {
         if (send(clients[index], Meniu::meniu_unauth_user_on_profile, SIZE, 0) == -1) {
@@ -547,7 +541,6 @@ void unauthUserOnUserProfile(int index) {
             }
 
             handleUnauthUser(index);
-            continue;
         } else {
             strcpy(result, "\nUnknown command\n\n");
         }
@@ -564,7 +557,7 @@ void unauthUserOnUserProfile(int index) {
 void handleUnauthUser(int index) {
     char response[SIZE];
     int argn;
-    char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
+    char* argv[20], *result = new char[SIZE];
 
     while (true) {
         if (send(clients[index], Meniu::meniu_unauth_user, SIZE, 0) == -1) {
@@ -598,6 +591,17 @@ void handleUnauthUser(int index) {
 
                 unauthUserOnUserProfile(index);
             }
+        } else if (strcmp(argv[0], "quit") == 0) {
+            strcpy(result, "\nHope to see you back soon!\n\n");
+
+            if (send(clients[index], result, SIZE, 0) == -1) {
+                cout << "[server] Error at send().\n";
+                fflush(stdout);
+                continue;
+            }
+
+            clients[index] = -1;
+            pthread_exit(0);
         } else {
             strcpy(result, "\nUnknown command\n\n");
         }
@@ -606,10 +610,6 @@ void handleUnauthUser(int index) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
-        }
-
-        if (strcmp(argv[0], "quit") == 0) {
-            pthread_exit(0);
         }
     }
 }
@@ -659,27 +659,21 @@ void handleLoggedUser(int index) {
                     if (user1->isAdmin) {
                         if (user2->isAdmin) {
                             adminOnAdminFriendProfile(index);
-                            continue;
                         } else {
                             adminOnFriendProfile(index);
-                            continue;
                         }
                     } else {
                         userOnFriendProfile(index);
-                        continue;
                     }
                 } else if (code == 0) {
                     if (user1->isAdmin) {
                         if (user2->isAdmin) {
                             adminOnAdminUserProfile(index);
-                            continue;
                         } else {
                             adminOnUserProfile(index);
-                            continue;
                         }
                     } else {
                         userOnUserProfile(index);
-                        continue;
                     }
                 }
             }
@@ -715,7 +709,16 @@ void handleLoggedUser(int index) {
                 pthread_exit(0);
             }
         } else if (strcmp(argv[0], "log_out") == 0) {
+            strcpy(result, "\nHope to see you back soon!\n\n");
 
+            if (send(clients[index], result, SIZE, 0) == -1) {
+                cout << "[server] Error at send().\n";
+                fflush(stdout);
+                continue;
+            }
+
+            clients[index] = -1;
+            pthread_exit(0);
         } else {
             strcpy(result, "\nUnknown command\n\n");
         }
@@ -724,11 +727,6 @@ void handleLoggedUser(int index) {
             cout << "[server] Error at send().\n";
             fflush(stdout);
             continue;
-        }
-
-        //incheie comunicarea
-        if (strcmp(argv[0], "log_out") == 0) {
-            pthread_exit(0);
         }
     }
 }
@@ -794,8 +792,16 @@ void* authentication(void* arg) {
 
              logged_users[index] = NULL;
              handleUnauthUser(index);
-             continue;
          } else if (strcmp(argv[0], "quit") == 0) {
+             strcpy(result, "\nHope to see you back soon!\n\n");
+
+             if (send(clients[index], result, SIZE, 0) == -1) {
+                 cout << "[server] Error at send().\n";
+                 fflush(stdout);
+                 continue;
+             }
+
+             clients[index] = -1;
              pthread_exit(0);
          } else {
              strcpy(result, "\nUnknown command\n\n");
@@ -805,11 +811,6 @@ void* authentication(void* arg) {
              cout << "[server] Error at send().\n";
              fflush(stdout);
              continue;
-         }
-
-         //incheie comunicarea
-         if (strcmp(argv[0], "quit") == 0 || strcmp(argv[0], "log out") == 0 || strcmp(argv[0], "delete account") == 0) {
-             pthread_exit(0);
          }
      }
 }
