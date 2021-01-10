@@ -10,6 +10,8 @@ using namespace std;
 
 #define SIZE 2024
 
+string commands[] = {"username", "password", "firstname", "lastname", "country", "city", "occupation", "profileVisibility"};
+
 bool Command::signUp(char* argv[], int argn, char* response) {
     if (argn != 6) {
         strcpy(response, "\nYou didn't enter the parameters needed.\n\n");
@@ -25,7 +27,7 @@ bool Command::signUp(char* argv[], int argn, char* response) {
             return false;
         }
 
-        //criptam parola
+        strcpy(argv[2], Utils::encryptPassword(argv[2]));
 
         //adaugam user-ul in baza de date
         if (Database::addUser(argv, argn, response)) {
@@ -47,7 +49,8 @@ bool Command::logIn(char* argv[], int argn, char* response) {
         //verifica daca exista user-ul
         if (user) {
             //verifica daca parola este corecta
-            if (strcmp(user->password, argv[2]) != 0) {
+            strcpy(argv[2], Utils::encryptPassword(argv[2]));
+            if (strcmp(argv[2], user->password) != 0) {
                 strcpy(response, "\nIncorrect password.\n\n");
                 return false;
             } else {
@@ -64,8 +67,27 @@ void Command::editProfile(char* username, char* argv[], int argn, char* response
     if (argn != 3) {
         strcpy(response, "\nYou didn't enter the parameters needed.\n\n");
     } else {
-        if (Database::updateUser(username, argv[1], argv[2], response)) {
-            strcpy(response, "\nProfile edited successfully!\n\n");
+        int i = 0;
+        while (i < commands->length()) {
+            if (strcmp(commands[i].c_str(), argv[1]) == 0) {
+                break;
+            }
+            i++;
+        }
+
+        if (i < commands->length()) {
+            if (strcmp("profileVisibility", argv[1]) == 0) {
+                if (strcmp(argv[2], "public") != 0 && strcmp(argv[2], "private") != 0) {
+                    strcpy(response, "\nInvalid value for this field.\n\n");
+                    return;
+                }
+            }
+
+            if (Database::updateUser(username, argv[1], argv[2], response)) {
+                strcpy(response, "\nProfile edited successfully!\n\n");
+            }
+        } else {
+            strcpy(response, "\nInvalid field.\n\n");
         }
     }
 }
@@ -117,7 +139,9 @@ void Command::sharePost(char *username, char *argv[], int argn, char *response) 
         argv[argn++] = Utils::getCurrentDate();
         argv[argn++] = Utils::getCurrentTime();
 
-        if (Database::addPost(username, argv, argn, response)) {
+        if (strcmp(argv[1], "public") != 0 && strcmp(argv[1], "friends") != 0 && strcmp(argv[1], "close_friends") != 0) {
+            strcpy(response, "\nInvalid post visibility.\n\n");
+        } else if (Database::addPost(username, argv, argn, response)) {
             strcpy(response, "\nPost shared successfully!\n\n");
         }
     }

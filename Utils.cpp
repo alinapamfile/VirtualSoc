@@ -15,6 +15,16 @@ void Utils::inputParse(char response[], char* argv[], int &argn) {
     }
 }
 
+//cripteaza parola (Caesar Cypher Algorithm)
+char* Utils::encryptPassword(char *password) {
+    char *encryptedPass = new char[SIZE];
+    for (int i = 0; i < strlen(password); i++) {
+        char ch = password[i] + 5 % 26;
+        encryptedPass[i] = ch;
+    }
+    return encryptedPass;
+}
+
 //returneaza data curenta
 char* Utils::getCurrentDate() {
     time_t rawtime;
