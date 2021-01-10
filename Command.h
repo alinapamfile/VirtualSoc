@@ -5,7 +5,6 @@ using namespace std;
 
 class Command {
 public:
-    static pthread_mutex_t mutex;
     static bool signUp(char* argv[], int argn, char* response);
     static bool logIn(char* argv[], int argn, char* response);
     static void editProfile(char *username, char* argv[], int argn, char* response);

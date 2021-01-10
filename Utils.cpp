@@ -4,6 +4,7 @@
 
 #define SIZE 2024
 
+//functie de parsare al input-ului. In argv se returneaza cuvintele din input-ul clientului
 void Utils::inputParse(char response[], char* argv[], int &argn) {
     char *word;
     argn = 0;
@@ -14,6 +15,7 @@ void Utils::inputParse(char response[], char* argv[], int &argn) {
     }
 }
 
+//returneaza data curenta
 char* Utils::getCurrentDate() {
     time_t rawtime;
     struct tm * timeinfo;
@@ -26,6 +28,7 @@ char* Utils::getCurrentDate() {
     return currentdate;
 }
 
+//returneaza ora curenta
 char* Utils::getCurrentTime() {
     time_t rawtime;
     struct tm * timeinfo;
@@ -38,6 +41,13 @@ char* Utils::getCurrentTime() {
     return currenttime;
 }
 
+/*
+ * in 'type' se primeste conditia de selectare a inregistrarilor
+ * se returneaza:
+ * - 0 daca cei doi useri nu au relatia de prietenie cautata
+ * - 1 daca cei doi useri au relatia de prietenie cautata
+ * - -1 in caz de eroare
+ */
 int Utils::isFriend(sqlite3* db, char *username, char *friend_username, const char *type, char *errMessage) {
     char *stmt = new char[SIZE];
     sqlite3_stmt *result;

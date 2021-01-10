@@ -14,6 +14,7 @@ int Database::userExists(char *username, char *errMessage) {
 
     strcpy(stmt, "SELECT * FROM users WHERE username=?;");
 
+    //pregateste comanda sql
     if (sqlite3_prepare_v2(db, stmt, -1, &result, NULL) != SQLITE_OK) {
         cout << "[server] Error at sqlite3_prepare_v2().\n";
         fflush(stdout);
@@ -21,6 +22,7 @@ int Database::userExists(char *username, char *errMessage) {
         return -1;
     }
 
+    //ataseaza parametrii necesari comenzii
     if (sqlite3_bind_text(result, 1, username, -1, NULL) != SQLITE_OK) {
         cout << "[server] Error at sqlite3_bind_text()\n";
         fflush(stdout);

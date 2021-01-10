@@ -10,8 +10,6 @@ using namespace std;
 
 #define SIZE 2024
 
-pthread_mutex_t Command::mutex;
-
 bool Command::signUp(char* argv[], int argn, char* response) {
     if (argn != 6) {
         strcpy(response, "\nYou didn't enter the parameters needed.\n\n");
@@ -46,7 +44,9 @@ bool Command::logIn(char* argv[], int argn, char* response) {
     } else {
         User *user = Database::getUser(argv[1], response);
 
+        //verifica daca exista user-ul
         if (user) {
+            //verifica daca parola este corecta
             if (strcmp(user->password, argv[2]) != 0) {
                 strcpy(response, "\nIncorrect password.\n\n");
                 return false;
@@ -81,7 +81,7 @@ bool Command::searchUser(char *argv[], int argn, char *response) {
             return false;
         } else if (code == 1) {
             return true;
-        } else {
+        } else { //daca user-ul nu exista, se afiseaza useri care au username-ul asemanator cu pattern ul care se cauta
             strcpy(response, "\nUser doesn't exist.\n");
             char *users[50];
             int count = 0;
@@ -130,6 +130,7 @@ void Command::deletePost(char *username, char *argv[], int argn, char *response)
         User *user = Database::getUser(username, response);
         Post *post = Database::getPost(argv[1], response);
 
+        //daca user-ul logat este admin, poate sterge orice postare de pe platforma
         if (user->isAdmin) {
             if (post) {
                 if (Database::deletePost(argv[1], response))
@@ -137,6 +138,7 @@ void Command::deletePost(char *username, char *argv[], int argn, char *response)
             }
         } else {
             if (post) {
+                //userii obisnuiti isi pot sterge doar postarile lor
                 if (strcmp(post->username, username) == 0) {
                     if (Database::deletePost(argv[1], response)) {
                         strcpy(response, "\nPost deleted successfully!\n\n");
@@ -149,30 +151,25 @@ void Command::deletePost(char *username, char *argv[], int argn, char *response)
     }
 }
 
-///TODO: scapa de res??
 void Command::sendMessage(char *username, char *argv[], int argn, char *response) {
     if (argn < 3) {
         strcpy(response, "\nYou didn't enter the parameters needed.\n\n");
     } else {
         User *user;
-        char *args[5], *res = new char[SIZE];
+        char *args[5];
         for (int i = 0; i < 5; i++)
             args[i] = new char[SIZE];
 
         for (int i = 2; i < argn; i++) {
-            user = Database::getUser(argv[i], res);
+            user = Database::getUser(argv[i], response);
             if (user) {
                 strcpy(args[0], username);
                 strcpy(args[1], argv[i]);
                 strcpy(args[2], argv[1]);
                 strcpy(args[3], Utils::getCurrentDate());
                 strcpy(args[4], Utils::getCurrentTime());
-                if (Database::addMessage(args, 5, res))
+                if (Database::addMessage(args, 5, response))
                     strcat(response, "\nMessage sent.\n\n");
-                else
-                    strcat(response, res);
-            } else {
-                strcat(response, res);
             }
         }
     }
