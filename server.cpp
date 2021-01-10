@@ -173,6 +173,16 @@ void adminOnAdminUserProfile(int index) {
             Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
         } else if (strcmp(argv[0], "delete_post") == 0) {
             Command::deletePost(logged_users[index], argv, argn, result);
+        } else if (strcmp(argv[0], "delete_user") == 0) {
+            if (Command::deleteAccount(searched_users[index], argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                pthread_exit(0);
+            }
         } else {
             cout << "Unknown command";
             fflush(stdout);
@@ -227,6 +237,16 @@ void adminOnAdminFriendProfile(int index) {
             }
         } else if (strcmp(argv[0], "delete_post") == 0) {
             Command::deletePost(logged_users[index], argv, argn, result);
+        } else if (strcmp(argv[0], "delete_user") == 0) {
+            if (Command::deleteAccount(searched_users[index], argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                pthread_exit(0);
+            }
         } else {
             cout << "Unknown command";
             fflush(stdout);
@@ -291,6 +311,16 @@ void adminOnFriendProfile(int index) {
             }
         } else if (strcmp(argv[0], "delete_post") == 0) {
             Command::deletePost(logged_users[index], argv, argn, result);
+        } else if (strcmp(argv[0], "delete_user") == 0) {
+            if (Command::deleteAccount(searched_users[index], argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                pthread_exit(0);
+            }
         } else {
             cout << "Unknown command";
             fflush(stdout);
@@ -365,6 +395,16 @@ void adminOnUserProfile(int index) {
             }
         } else if (strcmp(argv[0], "delete_post") == 0) {
             Command::deletePost(logged_users[index], argv, argn, result);
+        } else if (strcmp(argv[0], "delete_user") == 0) {
+            if (Command::deleteAccount(searched_users[index], argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                pthread_exit(0);
+            }
         } else {
             cout << "Unknown command";
             fflush(stdout);
