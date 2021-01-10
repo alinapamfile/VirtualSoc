@@ -23,12 +23,14 @@ pthread_t tid[CLIENTS_MAX_NR];
 int counter = 0, connectedClients = 0, clients[50];
 char* logged_users[50], *searched_users[50];
 
-void handleFriendUser(int index);
-void handleNotFriendUser(int index);
-void handleFriendAdmin(int index);
-void handleNotFriendAdmin(int index);
+void userOnFriendProfile(int index);
+void userOnUserProfile(int index);
+void adminOnAdminUserProfile(int index);
+void adminOnAdminFriendProfile(int index);
+void adminOnFriendProfile(int index);
+void adminOnUserProfile(int index);
 
-void handleFriendUser(int index) {
+void userOnFriendProfile(int index) {
     char response[SIZE];
     int argn;
     char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
@@ -61,7 +63,7 @@ void handleFriendUser(int index) {
                     continue;
                 }
 
-                handleNotFriendUser(index);
+                userOnUserProfile(index);
             }
         } else {
             cout << "Unknown command";
@@ -80,7 +82,7 @@ void handleFriendUser(int index) {
     }
 }
 
-void handleNotFriendUser(int index) {
+void userOnUserProfile(int index) {
     char response[SIZE];
     int argn;
     char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
@@ -115,7 +117,7 @@ void handleNotFriendUser(int index) {
                     continue;
                 }
 
-                handleFriendUser(index);
+                userOnFriendProfile(index);
             }
         } else if (strcmp(argv[0], "add_close_friend") == 0) {
             if (Command::addFriend(logged_users[index], searched_users[index], "close_friend", argn, result)) {
@@ -125,7 +127,7 @@ void handleNotFriendUser(int index) {
                     continue;
                 }
 
-                handleFriendUser(index);
+                userOnFriendProfile(index);
             }
         } else {
             cout << "Unknown command";
@@ -144,7 +146,101 @@ void handleNotFriendUser(int index) {
     }
 }
 
-void handleFriendAdmin(int index) {
+void adminOnAdminUserProfile(int index) {
+    char response[SIZE];
+    int argn;
+    char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
+
+    while (true) {
+        if (send(clients[index], Meniu::meniu_admin_adminuser, SIZE, 0) == -1) {
+            cout << "[server] Error at send().\n";
+            fflush(stdout);
+            continue;
+        }
+
+        if (recv(clients[index], &response, SIZE, 0) == -1) {
+            cout << "[server] Error at recv().\n";
+            fflush(stdout);
+            continue;
+        }
+        strcpy(copy, response);
+
+        Utils::inputParse(response, argv, argn);
+
+        if (strcmp(argv[0], "see_user_details") == 0) {
+            Command::seeUserDetails(logged_users[index], searched_users[index], argn, result);
+        } else if (strcmp(argv[0], "see_user_posts") == 0) {
+            Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
+        } else {
+            cout << "Unknown command";
+            fflush(stdout);
+        }
+
+        if (send(clients[index], result, SIZE, 0) == -1) {
+            cout << "[server] Error at send().\n";
+            fflush(stdout);
+            continue;
+        }
+
+        if (strcmp(argv[0], "log_out") == 0) {
+            pthread_exit(0);
+        }
+    }
+}
+
+void adminOnAdminFriendProfile(int index) {
+    char response[SIZE];
+    int argn;
+    char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
+
+    while (true) {
+        if (send(clients[index], Meniu::meniu_admin_adminfriend, SIZE, 0) == -1) {
+            cout << "[server] Error at send().\n";
+            fflush(stdout);
+            continue;
+        }
+
+        if (recv(clients[index], &response, SIZE, 0) == -1) {
+            cout << "[server] Error at recv().\n";
+            fflush(stdout);
+            continue;
+        }
+        strcpy(copy, response);
+
+        Utils::inputParse(response, argv, argn);
+
+        if (strcmp(argv[0], "see_user_details") == 0) {
+            Command::seeUserDetails(logged_users[index], searched_users[index], argn, result);
+        } else if (strcmp(argv[0], "see_user_posts") == 0) {
+            Command::seeUserPosts(logged_users[index], searched_users[index], argn, result);
+        } else if (strcmp(argv[0], "remove_friend") == 0) {
+            if (Command::removeFriend(logged_users[index], searched_users[index], argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                adminOnAdminUserProfile(index);
+            }
+        } else {
+            cout << "Unknown command";
+            fflush(stdout);
+        }
+
+        if (send(clients[index], result, SIZE, 0) == -1) {
+            cout << "[server] Error at send().\n";
+            fflush(stdout);
+            continue;
+        }
+
+        if (strcmp(argv[0], "log_out") == 0) {
+            pthread_exit(0);
+        }
+    }
+}
+
+void adminOnFriendProfile(int index) {
     char response[SIZE];
     int argn;
     char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
@@ -177,7 +273,17 @@ void handleFriendAdmin(int index) {
                     continue;
                 }
 
-                handleNotFriendAdmin(index);
+                adminOnUserProfile(index);
+            }
+        } else if (strcmp(argv[0], "make_admin") == 0) {
+            if (Command::makeAdmin(searched_users[index], argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                adminOnAdminFriendProfile(index);
             }
         } else {
             cout << "Unknown command";
@@ -196,7 +302,7 @@ void handleFriendAdmin(int index) {
     }
 }
 
-void handleNotFriendAdmin(int index) {
+void adminOnUserProfile(int index) {
     char response[SIZE];
     int argn;
     char* argv[20], *result = new char[SIZE], *copy = new char[SIZE];
@@ -229,7 +335,7 @@ void handleNotFriendAdmin(int index) {
                     continue;
                 }
 
-                handleFriendAdmin(index);
+                adminOnFriendProfile(index);
             }
         } else if (strcmp(argv[0], "add_close_friend") == 0) {
             if (Command::addFriend(logged_users[index], searched_users[index], "close_friend", argn, result)) {
@@ -239,7 +345,17 @@ void handleNotFriendAdmin(int index) {
                     continue;
                 }
 
-                handleFriendAdmin(index);
+                adminOnFriendProfile(index);
+            }
+        } else if (strcmp(argv[0], "make_admin") == 0) {
+            if (Command::makeAdmin(searched_users[index], argn, result)) {
+                if (send(clients[index], result, SIZE, 0) == -1) {
+                    cout << "[server] Error at send().\n";
+                    fflush(stdout);
+                    continue;
+                }
+
+                adminOnAdminFriendProfile(index);
             }
         } else {
             cout << "Unknown command";
@@ -337,26 +453,37 @@ void handleLoggedUser(int index) {
                     continue;
                 }
 
-                User *user = Database::getUser(logged_users[index], result);
+                User *user1 = Database::getUser(logged_users[index], result);
+                User *user2 = Database::getUser(searched_users[index], result);
 
-                if (user) {
+                if (user1) {
                     int code = Utils::isFriend(Database::db, logged_users[index], searched_users[index], NULL, result);
                     if (code == 1) {
-                        if (user->isAdmin) {
-                            handleFriendAdmin(index);
-                            continue;
+                        if (user1->isAdmin) {
+                            if (user2->isAdmin) {
+                                adminOnAdminFriendProfile(index);
+                                continue;
+                            } else {
+                                adminOnFriendProfile(index);
+                                continue;
+                            }
                         }
                         else {
-                            handleFriendUser(index);
+                            userOnFriendProfile(index);
                             continue;
                         }
                     } else if (code == 0) {
-                        if (user->isAdmin) {
-                            handleNotFriendAdmin(index);
-                            continue;
+                        if (user1->isAdmin) {
+                            if (user2->isAdmin) {
+                                adminOnAdminUserProfile(index);
+                                continue;
+                            } else {
+                                adminOnUserProfile(index);
+                                continue;
+                            }
                         }
                         else {
-                            handleNotFriendUser(index);
+                            userOnUserProfile(index);
                             continue;
                         }
                     }

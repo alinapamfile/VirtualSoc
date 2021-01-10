@@ -62,6 +62,23 @@ public:
                                     "6. delete_post\n"
                                     "7. delete_user\n"
                                     "8. back\n";
+    static constexpr const char* meniu_admin_adminuser= "Enter one of the commands below:\n"
+                                                        "1. see_user_details\n"
+                                                        "2. see_user_posts\n"
+                                                        "3. add_friend\n"
+                                                        "4. add_close_friend\n"
+                                                        "5. send_message\n"
+                                                        "6. delete_post\n"
+                                                        "7. delete_user\n"
+                                                        "8. back\n";
+    static constexpr const char* meniu_admin_adminfriend = "Enter one of the commands below:\n"
+                                                      "1. see_user_details\n"
+                                                      "2. see_user_posts\n"
+                                                      "3. remove_friend\n"
+                                                      "4. send_message\n"
+                                                      "5. delete_post\n"
+                                                      "6. delete_user\n"
+                                                      "7. back\n";
 private:
     Meniu() {}
 };

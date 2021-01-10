@@ -171,6 +171,18 @@ bool Database::updateUser(char *username, char *field, char *value, char *errMes
     }
 }
 
+bool Database::updateUser(char *username, const char *field, int value, char *errMessage) {
+    string stmt  = (string)"UPDATE users SET " + (string)field + (string)"='" + to_string(value)
+                   + (string)"' WHERE username='" + (string)username + (string)"';";
+
+    if (sqlite3_exec(db, stmt.c_str(), NULL, NULL, NULL) != SQLITE_OK) {
+        strcpy(errMessage, "\nCommand couldn't been executed.\n\n");
+        return false;
+    } else {
+        return true;
+    }
+}
+
 bool Database::addPost(char *username, char *argv[], int argn, char *errMessage) {
     string stmt = (string)"INSERT INTO posts VALUES (null, '" + (string)username + "'";
 

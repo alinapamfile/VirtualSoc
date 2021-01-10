@@ -19,6 +19,7 @@ public:
     static bool addFriend(char *username, char *friend_username, const char *type, int argn, char *response);
     static bool removeFriend(char *username, char *friend_username, int argn, char *response);
     static bool deleteAccount(char *username, int argn, char *response);
+    static bool makeAdmin(char *username, int argn, char *response);
 private:
     Command() {}
 };

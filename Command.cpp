@@ -318,3 +318,19 @@ bool Command::deleteAccount(char *username, int argn, char *response) {
         }
     }
 }
+
+bool Command::makeAdmin(char *username, int argn, char *response) {
+    if (argn != 1) {
+        strcpy(response, "\nYou entered too many parameters.\n\n");
+        return false;
+    } else {
+        if (Database::updateUser(username, "isAdmin", 1, response)) {
+            strcpy(response, "\nUser ");
+            strcat(response, username);
+            strcat(response, " is now an admin.\n\n");
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
