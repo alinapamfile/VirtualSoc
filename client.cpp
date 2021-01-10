@@ -49,7 +49,11 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
 
-        cout << meniu << endl;
+        //afiseaza meniul primit de la server
+        cout << meniu << endl << endl;
+        cout << "Command: ";
+        fflush(stdout);
+
         //citeste comanda utilizatorului
         cin.getline(input, SIZE);
 

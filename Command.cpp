@@ -49,13 +49,12 @@ bool Command::logIn(char* argv[], int argn, char* response) {
         //verifica daca exista user-ul
         if (user) {
             //verifica daca parola este corecta
-            strcpy(argv[2], Utils::encryptPassword(argv[2]));
-            if (strcmp(argv[2], user->password) != 0) {
-                strcpy(response, "\nIncorrect password.\n\n");
-                return false;
-            } else {
+            if (strcmp(Utils::encryptPassword(argv[2]), user->password) == 0) {
                 strcpy(response, "\nSuccessfully logged in!\n\n");
                 return true;
+            } else {
+                strcpy(response, "\nIncorrect password.\n\n");
+                return false;
             }
         } else {
             return false;

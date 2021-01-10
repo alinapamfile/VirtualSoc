@@ -15,13 +15,13 @@ void Utils::inputParse(char response[], char* argv[], int &argn) {
     }
 }
 
-//cripteaza parola (Caesar Cypher Algorithm)
+//cripteaza parola
 char* Utils::encryptPassword(char *password) {
     char *encryptedPass = new char[SIZE];
     for (int i = 0; i < strlen(password); i++) {
-        char ch = password[i] + 5 % 26;
-        encryptedPass[i] = ch;
+        encryptedPass[i] = 'a' + (password[i] + 5) % 26;
     }
+    encryptedPass[strlen(password)] = '\0';
     return encryptedPass;
 }
 
